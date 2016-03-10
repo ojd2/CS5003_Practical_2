@@ -18,21 +18,20 @@ var bodyParser = require('body-parser');
 // NOTE: *NOT* your school/university username and password!
 var nano = require('nano')('http://127.0.0.1:5984');
 
-var taskdb = nano.db.use('questions'); // Reference to the database storing the tasks
+var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks
 
 // List all the questions information as JSON 
 function listQuestions(req, res) {
-    console.log('Node is to send a response to with a list of questions');
-    // taskdb.get('task_info', { revs_info : true }, function (err, tasks) {
-    //     res.json(tasks["task_data"]);
-    // });
+    qa_db.get('question_info', { revs_info : true }, function (err, questions) {
+        res.json(questions["question_data"]);
+    });
 }
 
 /*
 * Get the task with the given id req.id.
 */
 function getTask(req, res) {
-    taskdb.get('task_info', { revs_info : true }, function (err, tasks) {
+    qa_db.get('question_info', { revs_info : true }, function (err, tasks) {
         res.json(tasks["task_data"][req.params.id]);
     });
 }
@@ -41,25 +40,25 @@ function getTask(req, res) {
 * Delete the task with the given id req.id.
 */
 function deleteTask(req, res) {
-    taskdb.get('task_info', { revs_info : true }, function (err, tasks) {
+    qa_db.get('question_info', { revs_info : true }, function (err, tasks) {
         delete tasks["task_data"][req.params.id];
 
         // Note that 'tasks' already contains the _rev field we need to 
         // update the data
 
-        taskdb.insert(tasks, 'task_info', function (err, t) {
+        qa_db.insert(tasks, 'question_info', function (err, t) {
             res.json(tasks["task_data"]);
         });
     });
 }
 
 /*
-* Add updated task information to CouchDB
+* Add updated question information to CouchDB
 */
-function updateTaskDB(entryID, tasks) {
-    taskdb.insert(entryID, 'entryID', function(err_e, e) {
-        taskdb.insert(tasks, 'task_info', function(err_t, t) { 
-            console.log("Added task to CouchDB");
+function updateqa_db(entryID, questions) {
+    qa_db.insert(entryID, 'entryID', function(err_e, e) {
+        qa_db.insert(questions, 'question_info', function(err_t, t) { 
+            console.log("Added question to CouchDB");
             console.log(err_e);
             console.log(err_t);
         });
@@ -67,28 +66,28 @@ function updateTaskDB(entryID, tasks) {
 }
 
 /* 
-* Add a new question with the next task id (entryID)
+* Add a new question with the next question id (entryID)
 */
 function addQuestion(req, res) {
-    console.log('Node recieved this request:' + req);
-    // taskdb.get('entryID', { revs_info : true }, function (err, entryID) {
-    //     if (!err) {
-    //         var next_entry = entryID["next_entry"];
-    //         taskdb.get('task_info', { revs_info : true }, function (err, tasks) {
-    //             if (!err) {
-    //                 tasks["task_data"][next_entry] = { user: "edwin", task: req.body };
-    //                 entryID["next_entry"] = next_entry + 1;
 
-    //                 // Add the new data to CouchDB (separate function since
-    //                 // otherwise the callbacks get very deeply nested!)
-    //                 updateTaskDB(entryID, tasks);
+    qa_db.get('entryID', { revs_info : true }, function (err, entryID) {
+        if (!err) {
+            var next_entry = entryID["next_entry"];
+            qa_db.get('question_info', { revs_info : true }, function (err, questions) {
+                if (!err) {
+                    questions["question_data"][next_entry] = { user: "edwin", question: req.body };
+                    entryID["next_entry"] = next_entry + 1;
 
-    //                 res.writeHead(201, {'Location' : next_entry});
-    //                 res.end();
-    //             }
-    //         });
-    //     }
-    // });
+                    // Add the new data to CouchDB (separate function since
+                    // otherwise the callbacks get very deeply nested!)
+                    updateqa_db(entryID, questions);
+
+                    res.writeHead(201, {'Location' : next_entry});
+                    res.end();
+                }
+            });
+        }
+    });
 }
 
 // main()

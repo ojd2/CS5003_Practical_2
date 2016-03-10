@@ -1,4 +1,3 @@
-
 /*
  * Retrieve the question list by making an AJAX request
  */
@@ -8,7 +7,9 @@ function getQuestions() {
     req.setRequestHeader("Content-Type", "text/plain");
     req.onreadystatechange = function() {
         //should call function display questions
-        //console.log(JSON.parse(req.responseText));
+        //console.log = JSON.parse("" + req.responseText + "");
+        var obj = JSON.parse(req.responseText.toString());
+		console.log(obj);        	       
     }
     req.send(null);
 }
@@ -21,9 +22,12 @@ function sendQuestion(question){
     req.open("POST", "questions");
     req.setRequestHeader("Content-Type", "text/plain");
     req.onreadystatechange = function() {
-        getQuestions();
+        //console.log(req.responseText);
+     	getQuestions();
+        	
     }
     req.send(question);
+
 
 }
 
