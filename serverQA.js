@@ -110,7 +110,7 @@ app.post('/questions', addQuestion);
 //once node modules can be loaded by the clients browser, we expect that 
 //our server will be able to hear new questions and replys from the client
 //should see this as console.log of question or reply in the node terminal
-app.use(express.static(__dirname + '/node_modules'));
+app.use(express.static('node_modules'));
 app.use(express.static('dist'));
 app.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');
