@@ -1,6 +1,25 @@
 /*
- * Retrieve the question list by making an AJAX request
- */
+* Function to retrieve response and appended questions to HTML question area.
+*/
+function displayQuestions(objects) {
+	for(var i in objects) {	
+		// Store our question inside the JSON into data.
+		var data = objects[i].question;
+	}
+	// Set up foor loop to only capture the first question in data.
+	// For some reason though it looks as though 'displayQuestions' is being called four times?
+	// Is this to do with onstatechange? 
+	for (var k = 0, length = data.length; k < 1; k++) {
+		// Set up simple jQuery HTML append for our question from data.	
+		var q_title = $('<h3 class="question-title"><a href="">' + data + '</a></h3>');
+		$(".test_title").append(q_title);
+	}
+	// Simple debugging message.
+	console.log("Done");
+}
+/*
+** Retrieve the question list by making an AJAX request
+*/
 function getQuestions() {
     var req = new XMLHttpRequest();
     req.open("GET", "questions");
@@ -8,14 +27,20 @@ function getQuestions() {
     req.onreadystatechange = function() {
         //should call function display questions
         //console.log = JSON.parse("" + req.responseText + "");
+       
         var obj = JSON.parse(req.responseText.toString());
-		console.log(obj);        	       
+		console.log(obj);
+
+		displayQuestions(obj);
+
+
     }
     req.send(null);
 }
 
-/*Add a new question by making POST request to node server
-	question = a new question from user
+/*
+* Add a new question by making POST request to node server
+* question = a new question from user.
 **/
 function sendQuestion(question){
     var req = new XMLHttpRequest();
@@ -30,10 +55,11 @@ function sendQuestion(question){
 
 
 }
-
+/*
+* Initilise function to start application onload.
+**/
 function init() {
-
-	//event handler for new question submission
+	// Event handler for new question submission
 	$("#q_submit").click(function(event) {
 
 			// Get data form question input element. 
@@ -41,8 +67,7 @@ function init() {
 			//Send a post request to the server to add question to db
 			sendQuestion(entry);
 	});
-
-	//event handler for a reply to a question
+	// Event handler for a reply to a question
 	$("#rep_submit").click(function(event) {
 
 			var li_tag = $(event.target).parent();
