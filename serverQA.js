@@ -1,6 +1,7 @@
 /**
+* March 2016, CS5003, St Andrews MSc
 * serverQA.js
-* Author: oliver and donal, borrowed from edwin
+* Authors: Oliver and Donal, based-off Edwin's example ToDo server code.
 *
 **/
 
@@ -9,13 +10,9 @@ var express = require('express');
 var json = require('express-json');
 var bodyParser = require('body-parser');
 
-// TODO: Replace 'username' and 'password' with the username and password
-// given by couchdb-setup
-//
 // You will also need to replace the server name with the details given by
-// couchdb-setup
-//
-// NOTE: *NOT* your school/university username and password!
+// couchdb. Will need to include password and user name if this is setup in couchdb
+// "http://user:password@addressToCouchdb"
 var nano = require('nano')('http://127.0.0.1:5984');
 
 var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks
@@ -77,7 +74,7 @@ function addQuestion(req, res) {
                 if (!err) {
                     questions["question_data"][next_entry] = { user: "edwin", question: req.body };
                     entryID["next_entry"] = next_entry + 1;
-
+                    console.log("user edwin submitted question: " + req.body);
                     // Add the new data to CouchDB (separate function since
                     // otherwise the callbacks get very deeply nested!)
                     updateqa_db(entryID, questions);
@@ -97,19 +94,41 @@ app.use(json());
 app.use(express.query());
 app.use(bodyParser.text()); // For parsing POST requests 
 
+//serve static files
+app.use(express.static('node_modules'));
+app.use(express.static('dist'));
+
+//should first serve login screen, if authorised, serve question page
+//question page is currently 'page.html'
+//no login functionality yet
+app.get('/', function(req, res){
+
+    var options = {
+    root: __dirname + '/dist/',
+    dotfiles: 'deny',
+    headers: {
+        'x-timestamp': Date.now(),
+        'x-sent': true
+        }
+    };
+
+    var fileName = 'page.html';
+    res.sendFile(fileName, options, function (err) {
+        if (err) {
+            console.log(err);
+            res.status(err.status).end();
+        }
+        else {
+        console.log('Sent:', fileName);
+        }
+    });
+
+});
 
 app.get('/questions', listQuestions);
 //app.get('/tasks/:id', getTask);
 //app.get('/delete/:id', deleteTask);
 app.post('/questions', addQuestion);
 
-//we cannot get the node modules to load in the client browser
-//may have to look at the folder structure
-//we have been able to create and initalis the DB
-//once node modules can be loaded by the clients browser, we expect that 
-//our server will be able to hear new questions and replys from the client
-//should see this as console.log of question or reply in the node terminal
-app.use(express.static('node_modules'));
-app.use(express.static('dist'));
 app.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');
