@@ -9,6 +9,7 @@ var http = require('http');
 var express = require('express');
 var json = require('express-json');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 
 // You will also need to replace the server name with the details given by
 // couchdb. Will need to include password and user name if this is setup in couchdb
@@ -163,11 +164,69 @@ function addQuestion(req, res) {
     });
 }
 
+/**
+*   Validates a session id by querying sessionDb doc. Returns true or 
+*   false indicating liveness of session. 
+*/
+function validateSession(string) {
+    if (string === "tempUser") {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+/**
+*   If a valid userName and password is present in post body, 
+*   returns a session cookie for that user. Session cookie
+*   must be presented in subsequent requests to other routes.
+*   Otherwise, returns an error message. Cookies maintain state.
+*/
+function login(req, res) { 
+    req.body = JSON.parse(req.body);
+    var userName = req.body.userName;
+    var password = req.body.password;
+
+    // -- Check if userName and password match db of users ---------
+
+    // -- End of userDB logic --------------------------------------
+
+    // -- Response Logic ------------------------------------------- 
+    if (userName === "edwin" && password === "notActually") {
+        res.cookie("session", "tempUser");   
+    }
+    else {
+        res.send("Error: invalid login credentials. Try posting to /login with this as the body {\"userName\":\"edwin\", \"password\":\"notActually\"}");
+    }
+    // -- End of response logic ------------------------------------
+
+}
+
 /** 
 *   If valid session cookie is in get header, return page.html.
 *   Else return login.html.
 */
 function frontPage(req, res){
+    // --- Code on how accessing cookies in a request work --
+    // Cookie: session=tempUser
+    // req.cookies.session => "tempUser"
+    // --- End of cookie helper code ------------------------
+
+    var fileName;
+
+    // -- Logic of this function -------------------------------------
+    // if req.cookies.session is validated by validateSession function
+    // then we have a live session and a known user. Response with
+    // page.html, else login.html.
+    if (validateSession(req.cookies.session) === true) {
+        fileName = 'page.html'; 
+    }
+    else {
+        fileName = 'login.html';
+    }
+    // -- End of logic of this function -------------------------------
+
 
     var options = {
     root: __dirname + '/dist/',
@@ -178,7 +237,6 @@ function frontPage(req, res){
         }
     };
 
-    var fileName = 'page.html';
     res.sendFile(fileName, options, function (err) {
         if (err) {
             console.log(err);
@@ -191,15 +249,16 @@ function frontPage(req, res){
 
 }
 
-// --- Standard app setup for express ---------
+// --- Standard app setup for express -------------------
 var app = express()
 app.use(json());
 app.use(express.query());
 app.use(bodyParser.text()); // For parsing POST requests 
+app.use(cookieParser()); //For cookie handling.
 
 app.use(express.static('node_modules'));
 app.use(express.static('dist'));
-//--------------------------------------------
+//-------------------------------------------------------
 
 
 // -- Routing functions using Express as middleware follow ---------
@@ -212,12 +271,13 @@ app.use(express.static('dist'));
 */
 app.get('/', frontPage);
 
-//Username and password in post body. The function will check
-//the user database to match the password/username. If valid,
-//returns a session cookie for that user, that must be presented
-//on subsequent requests. (Maintains state.) Otherwise, returns
-//an error message that no such user exists.
+/** If valid userName and password is present in post body,
+    responds by setting the session cookie. Maintains state. 
+    Otherwise, responds with an error message.  
+    For now, post body as JSON: '{"userName":"edwin", "password":"notActually"}'
+*/
 app.post('/login/', login);
+
 
 //front page, hit up a list of questions like in quora
 app.get('/questions/', listQuestions);
@@ -238,3 +298,24 @@ app.post('/reply/', addReply);
 
 app.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');
+
+// ------- Testing section ------------------------
+
+// Also see backendTest.js 
+
+// --- func validateSession ------------
+// //should return true
+// console.log(validateSession('tempUser'));
+
+// //should return false
+// console.log(validateSession(''));
+
+// //should return false
+// console.log(validateSession(undefined));
+
+// //should return false
+// console.log(validateSession('true'));
+
+// //should return false
+// console.log(validateSession('terls'));
+// -- end of validateSession ------------
