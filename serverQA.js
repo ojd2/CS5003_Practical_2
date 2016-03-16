@@ -18,28 +18,26 @@ var nano = require('nano')('http://127.0.0.1:5984');
 
 var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks
 
-/** 
-*  List all the replies to a question identified by q_id in body of request
-*  Problem: Server crashes if q_id supplied does not exist in question_data
-*  Solution: Return error message if there is no q_id in path
-*  if (req.query.match(/reply/){
-*       return "Error. No q_id supplied"  
-*  }
+/** CURRENTLY BROKEN
+*   Lists all replies to question identified by q_id 
+*   in parameter of GET request. Should test for 
+*   session cookie.  
 */
 function listReplies(req, res) {
     //req.originalUrl;
     //req.query.q_id;
     var q_id = req.query.q_id;
+    //console.log(req.query);
 
-
-    if (req.query.match(/reply/) == "/reply/"){
+    if (req.path.match(/reply/) == "reply"){
+        console.log('into reply if statement');
        res.send("Error. No q_id parameter supplied. Path should be /reply/?q_id=value");  
-    }   
+    }
+
     //call db for questions doc, then find replies. 
     qa_db.get('question_info', { revs_info : true }, function (err, dbDoc) {
         var replies = dbDoc["question_data"][q_id]["replies"];
         
-
         //to catch bad q_id not in database
         if (replies == undefined) {
             res.json(replies);
@@ -50,11 +48,16 @@ function listReplies(req, res) {
     });
 }
 
-// List all the questions information as JSON 
+// List all the questions information as JSON, test for valid session. 
 function listQuestions(req, res) {
-    qa_db.get('question_info', { revs_info : true }, function (err, questions) {
-        res.json(questions["question_data"]);
-    });
+    if (validateSession(req.cookies.session) === true) {
+        qa_db.get('question_info', { revs_info : true }, function (err, questions) {
+            res.json(questions["question_data"]);
+        });
+    }
+    else {
+        res.send('No valid session cookie presented. User not logged in.');
+    }
 }
 
 /*
@@ -140,7 +143,14 @@ function addReply(req, res) {
 }
 
 /* 
-* Add a new question with the next question id (entryID)
+* Add a new question with the next question id (entryID).
+*    Needs to do: 
+*    Adds a new question to the DB. Looks into body of 
+*    post, and adds this as the question. Still a stub.
+*    Only adds questions as user 'edwin'. However,
+*    Upgrades to come: 
+*    Provided user is logged in, reads session cookie,
+*    works out who the user is, and adds appropriately 
 */
 function addQuestion(req, res) {
 
@@ -280,23 +290,30 @@ app.get('/', frontPage);
 app.post('/login/', login);
 
 
-/** Returns a list of questions in JSON format.
+/** Returns a list of questions in JSON format. 
+*   Provided valid session cookie is present.
 */
 app.get('/questions/', listQuestions);
 
 
+/** Adds a new question to the DB. Looks into body of 
+*   post, and adds this as the question. Still a stub.
+*   Only adds questions as user 'edwin'. However,
+*   Upgrades to come: 
+*   Provided user is logged in, reads session cookie,
+*   works out who the user is, and adds appropriately 
+*/
 app.post('/questions/', addQuestion);
 
 
-//send question id, return replies
+//send question id, return replies as JSON
+// If wrong q_id, or incorrect query, then get an 
+// error message as response.  However,
+//listReplies is CURRENTLY BROKEN
 app.get('/reply\?q_id=\w+|reply/', listReplies);
 
 //add a reply to a question, need to supply question id  
 app.post('/reply/', addReply);
-
-
-//app.get('/tasks/:id', getTask);
-//app.get('/delete/:id', deleteTask);
 
 app.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');
