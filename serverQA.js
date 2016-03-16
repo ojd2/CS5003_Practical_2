@@ -194,7 +194,8 @@ function login(req, res) {
 
     // -- Response Logic ------------------------------------------- 
     if (userName === "edwin" && password === "notActually") {
-        res.cookie("session", "tempUser");   
+        res.cookie("session", "tempUser");
+        res.send(null);   
     }
     else {
         res.send("Error: invalid login credentials. Try posting to /login with this as the body {\"userName\":\"edwin\", \"password\":\"notActually\"}");
@@ -279,7 +280,8 @@ app.get('/', frontPage);
 app.post('/login/', login);
 
 
-//front page, hit up a list of questions like in quora
+/** Returns a list of questions in JSON format.
+*/
 app.get('/questions/', listQuestions);
 
 
