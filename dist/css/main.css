@@ -388,7 +388,7 @@ table.dataTable thead .sorting:after {
     padding:10px 0;
 }
 
-#rep_textbox {
+.rep_textbox {
     margin:10px 20px;
     width: 90%;
 }
@@ -397,3 +397,15 @@ table.dataTable thead .sorting:after {
     margin:20px 20px;
 }
 
+#login-splash {
+    text-align: center;
+}
+
+#login {
+    display:block;
+    width:500px;
+    margin:0 auto;
+    padding:0 auto;
+    position: relative;
+    text-align: center;
+}
