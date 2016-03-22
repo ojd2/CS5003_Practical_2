@@ -88,6 +88,9 @@ function displayAll(objects) {
         	// "What are some must watch films by Krzysztof Zanussi?".
         	// we perform a simple sort again
       		Object.keys(objects).reverse().forEach(function(k) {
+      			// Capture today's date.
+      			var today = new Date().toISOString().slice(0, 10);
+
       			// Store our question inside the JSON into data.
 				// Create our <li> '.question_container' to append to <ul> 'questions'
 				container = document.getElementsByClassName('questions');
@@ -103,9 +106,13 @@ function displayAll(objects) {
 			  	'</span> <b>ID:</b> <span id="q_id"> '+
 			  	k +
 			  	'</span> <b>Submitted:</b> <span id="q_time"> '+
-			  	objects[k].timestamp +
+			  	// Try and find a more generic way. Just have today's date.
+			  	
+			  	today +
+			  	//objects[k].timestamp +
 			  	'</span></div>' +
 			  	'<div class="question_summary"><b>Replies:</b> <div class="q_replies">' + 
+			  	// if 'undefined' is detected in JSON. Hide.
 			  	objects[k].replies + 
 			  	'</div></div>' + 
 			  	'</div>' + 
@@ -271,7 +278,7 @@ function init() {
 	// Clear empty.
     $('.questions').html('');
 	getResponse();
-	alert('load');
+
 	// Event handler for new question submission.
 	$("#q_submit").click(function(event) {
 			// Get data form question input element. 
@@ -313,14 +320,23 @@ function init() {
 			console.log(q_id+':'+ rep_val);
 			 
 			// Capture a timestamp using the date() object.
-			rep_time = new Date().toString().trim();
-			console.log(rep_time);
+			//rep_time = new Date().toString().trim();
+			//console.log(rep_time);
 			// Call the sendReply method.       
 			sendReply();
+
+
+			// NEED TO FIND A WAY TO REFRESH PAGE OR CALL FUNCTION
+			// TO LOAD REPLIES.
+			// Call getResponse
+			location.reload();
+			
+
 			// Call the sendTimeStamp method.
-			sendTimeStamp();
+			//sendTimeStamp();
 			// Clear textbox
 			$('.rep_textbox').val('');
+
 	});
 }
 
