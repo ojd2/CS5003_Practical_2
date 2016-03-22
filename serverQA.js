@@ -138,7 +138,37 @@ function addReply(req, res) {
         }
     });
 }
+/* 
+* Add a new time stamp to a question identified by q_id body of request
+*/
+function addTimeStamp(req, res) {
+    //supply post request in body a JSON object with a q_id and a timestamp text
+    req.body = JSON.parse(req.body);
+    var q_id = req.body.q_id;
+    var timestamp = req.body.timestamp;
 
+    qa_db.get('question_info', { revs_info : true }, function (err, questions) {
+    if (!err) {
+        //should be an array of timestamps, or undefined;
+        var timestamps = questions["question_data"][q_id]["timestamps"];
+        if (timestamps == undefined) {
+            questions["question_data"][q_id]["timestamps"] = [];
+            timestamps = questions["question_data"][q_id]["timestamps"];
+            console.log('into if statement');
+
+        }
+        timestamps.push(timestamp);
+        console.log("question: " + q_id + " had a timestamp added: " + timestamp);
+                
+        // Add the new data to CouchDB (separate function since
+        // otherwise the callbacks get very deeply nested!)
+        updateTEMP(questions);
+
+        res.writeHead(201, {'Location' : 'Not sure this is needed?'});
+        res.end();
+        }
+    });
+}
 /* 
 * Add a new question with the next question id (entryID)
 */
@@ -282,7 +312,7 @@ app.post('/login/', login);
 //front page, hit up a list of questions like in quora
 app.get('/questions/', listQuestions);
 
-
+// send question
 app.post('/questions/', addQuestion);
 
 
@@ -291,6 +321,9 @@ app.get('/reply\?q_id=\w+|reply/', listReplies);
 
 //add a reply to a question, need to supply question id  
 app.post('/reply/', addReply);
+
+//add a timestamp to a question, need to supply question id  
+app.post('/timestamp/', addTimeStamp);
 
 
 //app.get('/tasks/:id', getTask);

@@ -11,7 +11,7 @@ var req, data, user;
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 var container, question, reply, inner_q, panel_q, header_q, inner_panel, rep_q,
-rep_text, rep_submit, rep_reply, q_title, q_meta, q_id;
+rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test, q_title, q_meta, q_id;
 
 function displayReply(objects) {
  // For identifying which question
@@ -44,16 +44,13 @@ function displayReply(objects) {
  // the Object.keys() method. However, unlike
  // the sorted method, we do NOT need to 
  // include .reverse().
- 
- //var keys = [];
 
 	// Here we loop through our
 	// objects without being sorted.
 	alert('inside displayReply');
     for(var r in objects) {
         console.log(r);
-        console.log(objects[r].replies);
-        //keys.push(objects[r].replies);         
+        console.log(objects[r].replies);        
    	}
 
 }
@@ -103,18 +100,21 @@ function displayAll(objects) {
 			  	'</a></h3>' + 
 			  	'<div class="question_meta"><b>Username:</b> <span id="q_username"> ' +
 			  	objects[k].user +
-			  	'</span> <b>ID:</b> <span id="q_id"> ' +
-				k + 
+			  	'</span> <b>ID:</b> <span id="q_id"> '+
+			  	k +
+			  	'</span> <b>Submitted:</b> <span id="q_time"> '+
+			  	objects[k].timestamp +
 			  	'</span></div>' +
-			  	'<div class="question_summary"><b>Reply:</b> ' + objects[k].question + 
+			  	'<div class="question_summary"><b>Replies:</b> <div class="q_replies">' + 
+			  	objects[k].replies + 
+			  	'</div></div>' + 
 			  	'</div>' + 
 			  	'</div>' + 
-			  	'<div>';
+			  	'<h3 class="reply-title">Submit a reply:</h3>';
 
 			  	// Set up a 'submit reply' button.
 			  	rep_q = document.createElement( "button" );
-			  	rep_q.id = 'rep_submit';
-			  	rep_q.className = 'btn btn-primary';
+			  	rep_q.className = 'rep_submit btn';
 			  	rep_q.innerHTML = 'Submit Reply';
 
 			  	// Set up a 'textbox' for reply.
@@ -127,12 +127,20 @@ function displayAll(objects) {
 				$(question).appendTo(container);
 				$(rep_text).appendTo(question);
 				$(rep_q).appendTo(question);	
-				console.log(objects[k]);
+				
 
 				
+				// STILL WORKING ON THIS. NEED TO SOMEHOW SEPERATE REPLIES
+				// RATHER THAN ALL REPLIES IN ONE PARAGRAPH WHEN RETURNED
+				// FROM JSON.
+				rep_area = document.getElementsByClassName('q_replies');
+				rep_area.innerHTML = '<p>' + objects[k].replies + '</p>';
+				
+				//$(objects[k].replies).appendTo(rep_area);
 			});
-      	    	
-    
+
+			
+
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -207,18 +215,31 @@ function getReply() {
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-// Add a reply by making POST request to node server. Not finished.
-// Uses dummy values for the mean-time.
+// Add a reply by making POST request to node server.
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 function sendReply(){
     req = new XMLHttpRequest();
     req.open("POST", "reply");
     req.setRequestHeader("Content-Type", "text/plain");
-    req.send('{"q_id":"'+ q_id + '","reply":"'+ reply  +'"}');
+    req.send('{"q_id":"'+q_id+'","reply":"'+rep_val+'"}');
     req.onreadystatechange = function() {
     	alert('inside sendReply');
-    	getReply();
+    }
+}
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Add a time stamp by making POST request to node server. 
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function sendTimeStamp(){
+    req = new XMLHttpRequest();
+    req.open("POST", "timestamp");
+    req.setRequestHeader("Content-Type", "text/plain");
+    req.send('{"q_id":"'+q_id+'","timestamp":"'+rep_time+'"}');
+    req.onreadystatechange = function() {
+    	alert('inside sendTime');
+    	//getReply();
     }
     //req.send(reply);
 }
@@ -257,42 +278,49 @@ function init() {
 			var entry = $("#q_id").val();
 			// Send a post request to the server to add question to db
 			sendQuestion(entry);
+			// Clear textbox
+			$('#q_id').val('');
 	});
 	
 	// Event handler for a replying to a question.
 	$(".rep_textbox").keypress(function(event) {
 			// alert('inside rep_submit click');	
 			if ( $('.rep_textbox:focus').length > 0 ) {
-			alert('hello');
+			// Identify parent HTML element.
+			// This would be our <li> element.
 			var $textarea = $('.rep_textbox'),
     		$parent = $textarea.parent();
     		console.log($parent);
 			
-			// Almost the unique ID for the question 
-			q_id = $(this).closest('li').find('#q_id').html();
-				console.log(q_id);
+			// Here we search within the parent for 
+			// the unique id number of the proposed
+			// question. We store this in a value 
+			// called 'q_id'. We also search for the 
+			// textarea within the selected parent.
+			// This way we can capture multiple changes
+			// on the go. We store the reply values in 
+			// a value called 'rep_val'.
+			q_id = $(this).closest('li').find('#q_id').html().trim();
 			}
-	
-			// Need to get the text of the reply
-			// Get data form question input element. 
-			// event.parent
-			
-			// get value and trim white spaces.
-			// var rep_val = $.trim($("#rep_textbox").val());
-			// if (rep_val != "") {
-			        	
+		});
 
-			//         // console.log(q_id + ' : ');
-			//         console.log('reply:' + rep_val);
-			        
-			//         reply = rep_val;
-			        
-			//         // Call the sendReply method.
-			        
-			//         //sendReply();
-			// }
-			
-			
+	$(".rep_submit").click(function(event) {
+			// Finally, we can grab the value of the 
+			// textbox. We store the value inside the 
+			// value 'rep_val'. 
+			// Here we, get value and trim white spaces.
+			rep_val = $(this).closest("li").find(".rep_textbox").val().trim().toString();
+			console.log(q_id+':'+ rep_val);
+			 
+			// Capture a timestamp using the date() object.
+			rep_time = new Date().toString().trim();
+			console.log(rep_time);
+			// Call the sendReply method.       
+			sendReply();
+			// Call the sendTimeStamp method.
+			sendTimeStamp();
+			// Clear textbox
+			$('.rep_textbox').val('');
 	});
 }
 

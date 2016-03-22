@@ -5,7 +5,19 @@
  */
 
 body {
-    background-color: #f8f8f8;
+    background-color: #282627;
+    font-family: Georgia, Times New Roman !important;
+    font-size: 14px;
+    font-weight: lighter;
+}
+
+a {
+    color: #8DF9FF !important;
+}
+
+a:hover {
+    color: #FFF4A3 !important;
+    background:#282627 !important;
 }
 
 #wrapper {
@@ -15,14 +27,22 @@ body {
 #page-wrapper {
     padding: 0 15px;
     min-height: 568px;
-    background-color: #fff;
+    background-color: #282627;
 }
 
 .navbar-brand {
-    font-family: Helvetica Neue;
-    font-size:22px;
-    font-weight: bold;
-
+    font-family: Georgia, Times New Roman;
+    font-size: 28px;
+    font-style: italic;
+    font-weight: normal;
+    
+}
+.navbar-default {
+    background-color: #282627 !important;
+}
+.navbar-default .navbar-brand {
+    color: #8DF9FF !important;
+    
 }
 
 @media(min-width:768px) {
@@ -49,6 +69,8 @@ body {
 .navbar-top-links li a {
     padding: 15px;
     min-height: 50px;
+    color:#f9fcf8 !important;
+    font-weight: lighter;
 }
 
 .navbar-top-links .dropdown-menu li {
@@ -105,8 +127,12 @@ body {
     border-bottom: 1px solid #e7e7e7;
 }
 
+.nav .open > a, .nav .open > a:focus, .nav .open > a:hover {
+    background-color: #282627 !important; 
+}
+
 .sidebar ul li a.active {
-    background-color: #eee;
+    background-color: #282627;
 }
 
 .sidebar .arrow {
@@ -361,44 +387,64 @@ table.dataTable thead .sorting:after {
 }
 
 .question_container {
-    list-style: none;
+    background: #D6E3D2 none repeat scroll 0 0;
+    border-radius: 5px;
+    list-style: outside none none;
+    margin: 20px 0;
+    padding: 15px;
 }
 
 .question-replies {
     padding-left:30px;
 }
+.question-title {
+    padding:0 20px;
+}
+.question-title a {
+    color: #333 !important;
+    font-family: Georgia, Times New Roman;
+    font-size: 28px;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.question-title a:hover {
+    color:#494A4F !important;
+    background: none !important;
+}
 
 .question_summary {
     margin:0 auto;
     width:100%;
-    font-size:14px;
+    font-size:16px;
     display: block;
     position: relative;
-    padding:0 20px;
+    padding:0 40px;
     font-style: italic;
+    color: #494a4f;
+    font-family: Georgia, Times New Roman;
 }
 
 .question_meta {
     float:left;
     margin:0 auto;
     width:100%;
-    font-size:12px;
+    font-size:16px;
     display: block;
     position: relative;
-    padding:10px 0;
+    padding:10px 20px;
+    font-family: Georgia, Times New Roman;
 }
 
 .rep_textbox {
-    margin:10px 20px;
+    margin:10px 40px;
     width: 90%;
-}
-
-#rep_submit {
-    margin:20px 20px;
 }
 
 #login-splash {
     text-align: center;
+    background: none !important;
+    color:white;
 }
 
 #login {
@@ -408,4 +454,96 @@ table.dataTable thead .sorting:after {
     padding:0 auto;
     position: relative;
     text-align: center;
+    color:white;
+}
+
+#q_submit {
+    background:#FFEB57;
+    color:#282627;
+    border:1px solid #FFEB57;
+    font-family: Georgia, Times New Roman;
+}
+
+#q_submit:hover {
+    background:#FFF4A3;
+    border:1px solid #FFF4A3;
+}
+
+.rep_submit {
+    background:#FFEB57;
+    margin:20px 20px;
+    color:#282627;
+    border:1px solid #FFEB57;
+    font-family: Georgia, Times New Roman;
+}
+
+.rep_submit:hover {
+    background:#FFF4A3;
+    border:1px solid #FFF4A3;
+    color:#333;
+}
+
+.form-control:focus {
+    border-color: #8DF9FF !important;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(141, 249, 255, 0.6) !important;
+}
+
+.jumbotron .h1, .jumbotron h1 {
+    font-family: Georgia, Times New Roman;
+    font-style: italic;
+    font-weight: normal;
+    color:#8df9ff !important;
+}
+
+.form-horizontal .control-label {
+    font-weight:lighter;
+}
+
+.btn-default {
+    background:#282627;
+    color:white;
+}
+
+.panel-default {
+   border-color:#949499 !important; 
+}
+
+.panel-default > .panel-heading {
+   background: #949499;
+   border-color:#949499 !important;
+   color:#F9FCF8;
+}
+
+.panel-body {
+    border-color:#C1B0A9 !important;
+}
+
+.panel {
+    background:#4A4A4C  !important;
+}
+
+.dropdown-menu {
+   background:#333 !important; 
+}
+
+.nav > li > a {
+    color:#F9FCF8 !important;
+    font-weight:lighter;
+}
+
+.input-group .form-control {
+    font-family: Georgia, Times New Roman;
+}
+
+.reply-title {
+    padding:0 40px;
+}
+
+.q_replies {
+    width:100%;
+    height:100%;
+    display:block;
+    margin:0 auto;
+    padding:0 30px;
+    color:#4D5369;
 }
