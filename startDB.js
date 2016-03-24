@@ -14,7 +14,9 @@ var nano = require('nano')('http://127.0.0.1:5984');
 // our application's model, populated with one entry
 var entryID = { "next_entry" : 1 };
 var init_questions = { "question_data" :
-                    {"1": {"user": "edwin", "question": "How do I ?"}} };
+                    {"1": {"user": "donal", "question": "Software Engineering: What is the truth of 10x programmers?"},
+                    "2": {"user": "donal", "question": "Why are the following conditions required for two slit interference?"}}
+                };
 
 nano.db.destroy('questions', function (err, body) {
    console.log(err);

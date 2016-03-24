@@ -11,49 +11,50 @@ var req, data, user;
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 var container, question, reply, inner_q, panel_q, header_q, inner_panel, rep_q,
-rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test, q_title, q_meta, q_id;
+rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test, q_title, q_meta, q_id,
+date;
 
-function displayReply(objects) {
- // For identifying which question
- // has a reply, we must identify
- // the unique id of each question
- // inserted into the DB. To do this,
- // we make use of the JSON layout
- // couchDB provides. 
+// function displayReply(objects) {
+//  // For identifying which question
+//  // has a reply, we must identify
+//  // the unique id of each question
+//  // inserted into the DB. To do this,
+//  // we make use of the JSON layout
+//  // couchDB provides. 
 
- // Each question submitted to the DB,
- // has the following delegated layout:
+//  // Each question submitted to the DB,
+//  // has the following delegated layout:
  
- // "question_data": {
- //       "1": {
- //           "user": "edwin",
- //           "question": "How do you make pancakes?"
- //       },
- //       "2": {
- //           "user": "edwin",
- //           "question": "What are the films every programmer must watch?"
- //       }
+//  // "question_data": {
+//  //       "1": {
+//  //           "user": "edwin",
+//  //           "question": "How do you make pancakes?"
+//  //       },
+//  //       "2": {
+//  //           "user": "edwin",
+//  //           "question": "What are the films every programmer must watch?"
+//  //       }
 
- // With this in mind, we can identify
- // each question by using the global
- // object key. In this case it will be 
- // the index number [1,2].
+//  // With this in mind, we can identify
+//  // each question by using the global
+//  // object key. In this case it will be 
+//  // the index number [1,2].
 
- // To fetch the index key numbers
- // we can do a simple for each loop inside
- // the Object.keys() method. However, unlike
- // the sorted method, we do NOT need to 
- // include .reverse().
+//  // To fetch the index key numbers
+//  // we can do a simple for each loop inside
+//  // the Object.keys() method. However, unlike
+//  // the sorted method, we do NOT need to 
+//  // include .reverse().
 
-	// Here we loop through our
-	// objects without being sorted.
-	alert('inside displayReply');
-    for(var r in objects) {
-        console.log(r);
-        console.log(objects[r].replies);        
-   	}
+// 	// Here we loop through our
+// 	// objects without being sorted.
+// 	alert('inside displayReply');
+//     for(var r in objects) {
+//         console.log(r);
+//         console.log(objects[r].replies);        
+//    	}
 
-}
+// }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Function to retrieve response & appended question to HTML question.
@@ -75,7 +76,6 @@ function displayQuestion(objects) {
 function displayAll(objects) {
 		// Clear empty.
     	$('.questions').html('');
-
         	// Here we use the Object.key Prototype method
         	// which simply iterates through all objects 
         	// passed from the associative array and for 
@@ -88,9 +88,6 @@ function displayAll(objects) {
         	// "What are some must watch films by Krzysztof Zanussi?".
         	// we perform a simple sort again
       		Object.keys(objects).reverse().forEach(function(k) {
-      			// Capture today's date.
-      			var today = new Date().toISOString().slice(0, 10);
-
       			// Store our question inside the JSON into data.
 				// Create our <li> '.question_container' to append to <ul> 'questions'
 				container = document.getElementsByClassName('questions');
@@ -106,14 +103,12 @@ function displayAll(objects) {
 			  	'</span> <b>ID:</b> <span id="q_id"> '+
 			  	k +
 			  	'</span> <b>Submitted:</b> <span id="q_time"> '+
-			  	// Try and find a more generic way. Just have today's date.
-			  	
-			  	today +
-			  	//objects[k].timestamp +
+			  	date +
 			  	'</span></div>' +
-			  	'<div class="question_summary"><b>Replies:</b> <div class="q_replies">' + 
-			  	// if 'undefined' is detected in JSON. Hide.
+			  	'<div class="question_summary"><b class="rep_title">Replies:</b> <div class="q_replies">' +
+			  	'<p id="rep_text">' + 
 			  	objects[k].replies + 
+			  	'</p>' +
 			  	'</div></div>' + 
 			  	'</div>' + 
 			  	'</div>' + 
@@ -135,20 +130,18 @@ function displayAll(objects) {
 				$(rep_text).appendTo(question);
 				$(rep_q).appendTo(question);	
 				
-
-				
-				// STILL WORKING ON THIS. NEED TO SOMEHOW SEPERATE REPLIES
-				// RATHER THAN ALL REPLIES IN ONE PARAGRAPH WHEN RETURNED
-				// FROM JSON.
-				rep_area = document.getElementsByClassName('q_replies');
-				rep_area.innerHTML = '<p>' + objects[k].replies + '</p>';
-				
-				//$(objects[k].replies).appendTo(rep_area);
+				// Hide replies if JSON key is not present.
+				// Use some simple HTML DOM manipulation for now.
+				var t = $('.rep_title');
+				$('#rep_text:contains("undefined")').html('<p class="no_rep">No replies have been submitted...</p>');
+		
 			});
 
 			
 
 }
+
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Retrieve ALL data then apply sort algorithm.
@@ -161,6 +154,9 @@ function orderKeys(objects) {
  // We want to grab all objects simply push
  // our sorted objects into an associative array.
  var sorted = {};
+
+
+
  Object.keys(objects).sort(function(a, b) {
   	 	return a - b;
  }).forEach(function(v, i) {
@@ -170,6 +166,7 @@ function orderKeys(objects) {
  	   //console.log(objects[v]);
        sorted = objects;
    	});
+ 	
    	// Call to our display method for
    	// the sorted associative array.
    	displayAll(sorted);
@@ -216,7 +213,7 @@ function getReply() {
     req.onreadystatechange = function() {
   		// Call displayQuestion whilst parsing our objects.
   		alert('inside getReply');
-        displayReply(JSON.parse(req.responseText));
+        displayAll(JSON.parse(req.responseText));
     }
     req.send(null);
 }
@@ -232,23 +229,9 @@ function sendReply(){
     req.send('{"q_id":"'+q_id+'","reply":"'+rep_val+'"}');
     req.onreadystatechange = function() {
     	alert('inside sendReply');
+    	getReply();
+    	
     }
-}
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// Add a time stamp by making POST request to node server. 
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-function sendTimeStamp(){
-    req = new XMLHttpRequest();
-    req.open("POST", "timestamp");
-    req.setRequestHeader("Content-Type", "text/plain");
-    req.send('{"q_id":"'+q_id+'","timestamp":"'+rep_time+'"}');
-    req.onreadystatechange = function() {
-    	alert('inside sendTime');
-    	//getReply();
-    }
-    //req.send(reply);
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -278,7 +261,7 @@ function init() {
 	// Clear empty.
     $('.questions').html('');
 	getResponse();
-
+	alert('load');
 	// Event handler for new question submission.
 	$("#q_submit").click(function(event) {
 			// Get data form question input element. 
@@ -287,6 +270,13 @@ function init() {
 			sendQuestion(entry);
 			// Clear textbox
 			$('#q_id').val('');
+
+			// Capture a timestamp using the date() object.
+			rep_time = new Date().toString().trim();
+			date = rep_time.toString();
+			console.log(date);
+			//sendTimeStamp();
+
 	});
 	
 	// Event handler for a replying to a question.
@@ -319,24 +309,15 @@ function init() {
 			rep_val = $(this).closest("li").find(".rep_textbox").val().trim().toString();
 			console.log(q_id+':'+ rep_val);
 			 
-			// Capture a timestamp using the date() object.
-			//rep_time = new Date().toString().trim();
-			//console.log(rep_time);
+			
 			// Call the sendReply method.       
 			sendReply();
-
-
-			// NEED TO FIND A WAY TO REFRESH PAGE OR CALL FUNCTION
-			// TO LOAD REPLIES.
-			// Call getResponse
-			location.reload();
-			
-
 			// Call the sendTimeStamp method.
 			//sendTimeStamp();
 			// Clear textbox
 			$('.rep_textbox').val('');
-
+			// Reload after submit.
+			// location.reload();
 	});
 }
 

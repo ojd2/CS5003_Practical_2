@@ -547,3 +547,12 @@ table.dataTable thead .sorting:after {
     padding:0 30px;
     color:#4D5369;
 }
+
+.no_rep {
+    color:#333;
+    font-size:12px;
+}
+
+.hide {
+    display: none;
+}
