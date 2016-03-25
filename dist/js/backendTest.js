@@ -3,7 +3,7 @@ function testLoginRoute() {
     var req = new XMLHttpRequest();
     req.open("POST", "login");
     req.setRequestHeader("Content-Type", "text/plain");
-    req.send('{"userName":"edwin","password":"notActually"}');
+    req.send('{"userName":"donal","password":"justAnother"}');
 }
 
 //tests frontPage function in backend
@@ -11,7 +11,7 @@ function testLoginRoute() {
 // client accesses '/' route.
 function testFrontPageRoute() {
 	//create a cookie
-	document.cookie = "session=tempUser; path=/";
+	document.cookie = "session=donalUser; path=/";
 	//then, reload the page. It will switch from login.html to page.html.    
 }
 
