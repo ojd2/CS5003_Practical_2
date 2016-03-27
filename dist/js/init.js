@@ -14,47 +14,48 @@ var container, question, reply, inner_q, panel_q, header_q, inner_panel, rep_q,
 rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test, q_title, q_meta, q_id,
 date;
 
-// function displayReply(objects) {
-//  // For identifying which question
-//  // has a reply, we must identify
-//  // the unique id of each question
-//  // inserted into the DB. To do this,
-//  // we make use of the JSON layout
-//  // couchDB provides. 
+function displayReplies(objects) {
+ // For identifying which question
+ // has a reply, we must identify
+ // the unique id of each question
+ // inserted into the DB. To do this,
+ // we make use of the JSON layout
+ // couchDB provides. 
 
-//  // Each question submitted to the DB,
-//  // has the following delegated layout:
+ // Each question submitted to the DB,
+ // has the following delegated layout:
  
-//  // "question_data": {
-//  //       "1": {
-//  //           "user": "edwin",
-//  //           "question": "How do you make pancakes?"
-//  //       },
-//  //       "2": {
-//  //           "user": "edwin",
-//  //           "question": "What are the films every programmer must watch?"
-//  //       }
+ // "question_data": {
+ //       "1": {
+ //           "user": "edwin",
+ //           "question": "How do you make pancakes?"
+ //       },
+ //       "2": {
+ //           "user": "edwin",
+ //           "question": "What are the films every programmer must watch?"
+ //       }
 
-//  // With this in mind, we can identify
-//  // each question by using the global
-//  // object key. In this case it will be 
-//  // the index number [1,2].
+ // With this in mind, we can identify
+ // each question by using the global
+ // object key. In this case it will be 
+ // the index number [1,2].
 
-//  // To fetch the index key numbers
-//  // we can do a simple for each loop inside
-//  // the Object.keys() method. However, unlike
-//  // the sorted method, we do NOT need to 
-//  // include .reverse().
+ // To fetch the index key numbers
+ // we can do a simple for each loop inside
+ // the Object.keys() method. However, unlike
+ // the sorted method, we do NOT need to 
+ // include .reverse().
 
-// 	// Here we loop through our
-// 	// objects without being sorted.
-// 	alert('inside displayReply');
-//     for(var r in objects) {
-//         console.log(r);
-//         console.log(objects[r].replies);        
-//    	}
+	// Here we loop through our
+	// objects without being sorted.
+	alert('inside displayReply');
 
-// }
+	
+
+	// var obj = JSON.parse(objects);
+
+
+}
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Function to retrieve response & appended question to HTML question.
@@ -106,9 +107,9 @@ function displayAll(objects) {
 			  	date +
 			  	'</span></div>' +
 			  	'<div class="question_summary"><b class="rep_title">Replies:</b> <div class="q_replies">' +
-			  	'<p id="rep_text">' + 
-			  	objects[k].replies + 
-			  	'</p>' +
+			  	// '<p id="rep_text">' + 
+			  	// replies go in here
+			  	// '</p>' +
 			  	'</div></div>' + 
 			  	'</div>' + 
 			  	'</div>' + 
@@ -130,11 +131,15 @@ function displayAll(objects) {
 				$(rep_text).appendTo(question);
 				$(rep_q).appendTo(question);	
 				
+				// Call get request for replies now.
+				//getReply();
+
 				// Hide replies if JSON key is not present.
 				// Use some simple HTML DOM manipulation for now.
-				var t = $('.rep_title');
-				$('#rep_text:contains("undefined")').html('<p class="no_rep">No replies have been submitted...</p>');
-		
+				//var t = $('.rep_title');
+				//$('#rep_text:contains("undefined")').html('<p class="no_rep">No replies have been submitted...</p>');
+				
+
 			});
 
 			
@@ -170,6 +175,7 @@ function orderKeys(objects) {
    	// Call to our display method for
    	// the sorted associative array.
    	displayAll(sorted);
+   	displayReplies(sorted);
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -208,12 +214,12 @@ function getQuestion() {
 // ----------------------------------------------------------------------
 function getReply() {
     req = new XMLHttpRequest();
-    req.open("GET", "questions");
+    req.open("GET", "/reply?q_id=");
     req.setRequestHeader("Content-Type", "text/plain");
     req.onreadystatechange = function() {
   		// Call displayQuestion whilst parsing our objects.
-  		alert('inside getReply');
-        displayAll(JSON.parse(req.responseText));
+  		alert('inside getReply()');
+        displayReply();
     }
     req.send(null);
 }
