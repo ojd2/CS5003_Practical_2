@@ -217,6 +217,7 @@ function validateSession(string) {
 *   Otherwise, returns an error message. Cookies maintain state.
 *   Possible upgrades:
 *      -- Convert from hard-coded values for sessionCookie to dynamic
+*       -- would be good to hash the passwords
 */
 function login(req, res) { 
     req.body = JSON.parse(req.body);

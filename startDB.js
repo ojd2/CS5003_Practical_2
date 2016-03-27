@@ -67,7 +67,7 @@ var init_userNames = {"userNames":{
                         "donal": {"password": "justAnother", "sessionCookie": "donalCookie"},
                         "ollie": {"password": "camelCase", "sessionCookie":"ollieCookie"},
                     }};
-
+//would be a good idea to hash the passwords
 nano.db.destroy('usernames', function (err, body) {
    console.log(err);
 });
