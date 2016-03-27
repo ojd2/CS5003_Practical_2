@@ -341,6 +341,7 @@ app.post('/questions/', addQuestion);
 app.get('/reply\?q_id=\w+|reply/', listReplies);
 
 //add a reply to a question, need to supply question id  
+// in the body of the post request as {"q_id":<VALUE>, "reply":<VALUE>}
 app.post('/reply/', addReply);
 
 app.listen(8080);
