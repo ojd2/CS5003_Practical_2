@@ -17,29 +17,29 @@ var cookieParser = require('cookie-parser');
 var nano = require('nano')('http://127.0.0.1:5984');
 
 var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks
+var user_db = nano.db.use('usernames'); //Reference to the database storing usernames and passwords
+// var session_db = nano.db.use('sessions'); //Reference to the database storing live sessions and usernames
 
-/** 
-*  List all the replies to a question identified by q_id in body of request
-*  Problem: Server crashes if q_id supplied does not exist in question_data
-*  Solution: Return error message if there is no q_id in path
-*  if (req.query.match(/reply/){
-*       return "Error. No q_id supplied"  
-*  }
+/** CURRENTLY BROKEN
+*   Lists all replies to question identified by q_id 
+*   in parameter of GET request. Should test for 
+*   session cookie.  
 */
 function listReplies(req, res) {
     //req.originalUrl;
     //req.query.q_id;
     var q_id = req.query.q_id;
+    //console.log(req.query);
 
-
-    if (req.query.match(/reply/) == "/reply/"){
+    if (req.path.match(/reply/) == "reply"){
+        console.log('into reply if statement');
        res.send("Error. No q_id parameter supplied. Path should be /reply/?q_id=value");  
-    }   
+    }
+
     //call db for questions doc, then find replies. 
     qa_db.get('question_info', { revs_info : true }, function (err, dbDoc) {
         var replies = dbDoc["question_data"][q_id]["replies"];
         
-
         //to catch bad q_id not in database
         if (replies == undefined) {
             res.json(replies);
@@ -50,11 +50,16 @@ function listReplies(req, res) {
     });
 }
 
-// List all the questions information as JSON 
+// List all the questions information as JSON, test for valid session. 
 function listQuestions(req, res) {
-    qa_db.get('question_info', { revs_info : true }, function (err, questions) {
-        res.json(questions["question_data"]);
-    });
+    if (validateSession(req.cookies.session) === true) {
+        qa_db.get('question_info', { revs_info : true }, function (err, questions) {
+            res.json(questions["question_data"]);
+        });
+    }
+    else {
+        res.send('No valid session cookie presented. User not logged in.');
+    }
 }
 
 /*
@@ -140,7 +145,14 @@ function addReply(req, res) {
 }
 
 /* 
-* Add a new question with the next question id (entryID)
+* Add a new question with the next question id (entryID).
+*    Needs to do: 
+*    Adds a new question to the DB. Looks into body of 
+*    post, and adds this as the question. Still a stub.
+*    Only adds questions as user 'edwin'. However,
+*    Upgrades to come: 
+*    Provided user is logged in, reads session cookie,
+*    works out who the user is, and adds appropriately 
 */
 function addQuestion(req, res) {
 
@@ -149,9 +161,11 @@ function addQuestion(req, res) {
             var next_entry = entryID["next_entry"];
             qa_db.get('question_info', { revs_info : true }, function (err, questions) {
                 if (!err) {
-                    questions["question_data"][next_entry] = { user: "donal", question: req.body };
+                    var now = new Date();
+                    var jsonDate = now.toJSON();
+                    questions["question_data"][next_entry] = { user: "edwin", question: req.body, submitTime:jsonDate};
                     entryID["next_entry"] = next_entry + 1;
-                    console.log("user donal submitted question: " + req.body);
+                    console.log("user edwin submitted question: " + req.body);
                     // Add the new data to CouchDB (separate function since
                     // otherwise the callbacks get very deeply nested!)
                     updateqa_db(entryID, questions);
@@ -164,44 +178,69 @@ function addQuestion(req, res) {
     });
 }
 
+
 /**
 *   Validates a session id by querying sessionDb doc. Returns true or 
 *   false indicating liveness of session. 
+*   ISSUE:
+*   Callback of user_db.get correctly finds if the session cookie matches
+*   a userName. But, because it is asynchronous callback, it will not 
+*   return true in the if statement of frontPage function!
 */
 function validateSession(string) {
-    if (string === "tempUser") {
+    //query DB doc to see if cookie is present in DB
+
+    //------Currently this is not working because of the callback issues.----------
+    // user_db.get('user_info', { revs_info : true }, function (err, user_info) {
+    //     var userArray = Object.keys(user_info["userNames"]);
+    //     var result = false;
+    //     for (var i = 0; i<userArray.length; i++) {
+    //         if (user_info["userNames"][userArray[i]]["sessionCookie"] === string) {
+    //             result = true;
+    //         }
+    //     }
+    //     return result;
+    // });
+    //-------END of broken code, stub used instead ---------//
+    if (string === "edwinCookie" || string === "donalCookie" || string === "ollieCookie") {
         return true;
     }
     else {
         return false;
     }
 }
-
+      
 /**
 *   If a valid userName and password is present in post body, 
 *   returns a session cookie for that user. Session cookie
 *   must be presented in subsequent requests to other routes.
 *   Otherwise, returns an error message. Cookies maintain state.
+*   Possible upgrades:
+*      -- Convert from hard-coded values for sessionCookie to dynamic
+*       -- would be good to hash the passwords
 */
 function login(req, res) { 
     req.body = JSON.parse(req.body);
     var userName = req.body.userName;
     var password = req.body.password;
 
-    // -- Check if userName and password match db of users ---------
+    // -- Check if userName and password match db of users ------------------------------------
+    user_db.get('user_info', { revs_info : true }, function (err, user_info) {
 
-    // -- End of userDB logic --------------------------------------
-
-    // -- Response Logic ------------------------------------------- 
-    if (userName === "edwin" && password === "notActually") {
-        res.cookie("session", "tempUser");   
-    }
-    else {
-        res.send("Error: invalid login credentials. Try posting to /login with this as the body {\"userName\":\"edwin\", \"password\":\"notActually\"}");
-    }
-    // -- End of response logic ------------------------------------
-
+        if (user_info["userNames"][userName] &&
+                user_info["userNames"][userName]["password"] === password) {
+        // -- Response Logic -------------------------------------------             
+            res.cookie("session", user_info["userNames"][userName]["sessionCookie"]);
+            res.send(null);
+        }
+        else {
+            res.send("Error: invalid login credentials. Try posting to /login with this as the body {\"userName\":\"edwin\", \"password\":\"notActually\"}")
+        }
+        // -- End of response logic ------------------------------------       
+    });
+    // ------- END of userName and password db function ---------------------------------------
 }
+
 
 /** 
 *   If valid session cookie is in get header, return page.html.
@@ -279,25 +318,34 @@ app.get('/', frontPage);
 app.post('/login/', login);
 
 
-//front page, hit up a list of questions like in quora
+/** Returns a list of questions in JSON format. 
+*   Provided valid session cookie is present.
+*/
 app.get('/questions/', listQuestions);
 
-// send question
+
+/** Adds a new question to the DB. Looks into body of 
+*   post, and adds this as the question. Still a stub.
+*   Only adds questions as user 'edwin'. However,
+*   Upgrades to come: 
+*   Provided user is logged in, reads session cookie,
+*   works out who the user is, and adds appropriately 
+*/
 app.post('/questions/', addQuestion);
 
 
-//send question id, return replies
+//send question id, return replies as JSON
+// If wrong q_id, or incorrect query, then get an 
+// error message as response.  However,
+//listReplies is CURRENTLY BROKEN
 app.get('/reply\?q_id=\w+|reply/', listReplies);
 
 //add a reply to a question, need to supply question id  
+// in the body of the post request as {"q_id":<VALUE>, "reply":<VALUE>}
 app.post('/reply/', addReply);
 
-
-//app.get('/tasks/:id', getTask);
-//app.get('/delete/:id', deleteTask);
-
 app.listen(8080);
-console.log('Server running at http://127.0.0.1:8080/');
+console.log('Server running at http://127.0.0.1:8080/');    
 
 // ------- Testing section ------------------------
 

@@ -48,13 +48,20 @@ function displayReplies(objects) {
 
 	// Here we loop through our
 	// objects without being sorted.
-	alert('inside displayReply');
+
+	
+	alert('inside displayReplies()');
+	//console.log(objects);
+	var obj = [];
+	obj.push(objects);
+
+	console.log(obj);
+
+	
 
 	
 
 	// var obj = JSON.parse(objects);
-
-
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -142,8 +149,6 @@ function displayAll(objects) {
 
 			});
 
-			
-
 }
 
 
@@ -159,8 +164,6 @@ function orderKeys(objects) {
  // We want to grab all objects simply push
  // our sorted objects into an associative array.
  var sorted = {};
-
-
 
  Object.keys(objects).sort(function(a, b) {
   	 	return a - b;
@@ -212,17 +215,17 @@ function getQuestion() {
 // Retrieve the question list by making an AJAX request.
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-function getReply() {
-    req = new XMLHttpRequest();
-    req.open("GET", "/reply?q_id=");
-    req.setRequestHeader("Content-Type", "text/plain");
-    req.onreadystatechange = function() {
-  		// Call displayQuestion whilst parsing our objects.
-  		alert('inside getReply()');
-        displayReply();
-    }
-    req.send(null);
-}
+// function getReply() {
+//     req = new XMLHttpRequest();
+//     req.open("GET", "questions");
+//     req.setRequestHeader("Content-Type", "text/plain");
+//     req.onreadystatechange = function() {
+//   		// Call displayQuestion whilst parsing our objects.
+//   		alert('inside getReply()');
+//         displayReplies(JSON.parse(req.responseText));
+//     }
+//     req.send(null);
+// }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a reply by making POST request to node server.
