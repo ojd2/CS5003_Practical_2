@@ -145,8 +145,6 @@ function displayAll(objects) {
 				// Use some simple HTML DOM manipulation for now.
 				//var t = $('.rep_title');
 				//$('#rep_text:contains("undefined")').html('<p class="no_rep">No replies have been submitted...</p>');
-				
-
 			});
 
 }
@@ -192,6 +190,7 @@ function getResponse() {
     req.onreadystatechange = function() {
         // Call sorting method for our parsed response.
     	orderKeys(JSON.parse(req.responseText));
+
     }
     req.send(null);
 }
@@ -238,7 +237,7 @@ function sendReply(){
     req.send('{"q_id":"'+q_id+'","reply":"'+rep_val+'"}');
     req.onreadystatechange = function() {
     	alert('inside sendReply');
-    	getReply();
+    	//getReply();
     	
     }
 }
@@ -329,5 +328,4 @@ function init() {
 			// location.reload();
 	});
 }
-
 $(init);
