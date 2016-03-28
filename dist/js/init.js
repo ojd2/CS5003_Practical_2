@@ -42,11 +42,11 @@ function getQuestions() {
 * Add a new question by making POST request to node server. Not finished.
 * Uses dumbie values for the mean-time.
 **/
-function sendReply(){
+function sendReply(id, text){
     var req = new XMLHttpRequest();
     req.open("POST", "reply");
     req.setRequestHeader("Content-Type", "text/plain");
-    req.send('{"q_id":"2","reply":"We have successfull sent a reply to quesiton 2"}');
+    req.send('{"q_id":"' + id + '","reply":"' + text + '"}');
     req.onreadystatechange = function() {
         console.log(req.responseText);
      	//getQuestions();   	
