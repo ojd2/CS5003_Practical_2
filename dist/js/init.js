@@ -12,7 +12,7 @@ var req, data, user;
 // ----------------------------------------------------------------------
 var container, question, reply, inner_q, panel_q, header_q, inner_panel, rep_q,
 rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test, q_title, q_meta, q_id,
-date;
+date, userName, password;
 
 function displayReplies(objects) {
  // For identifying which question
@@ -260,6 +260,29 @@ function sendQuestion(question){
 
 
 }
+
+//Open a post request to path /login, with userName and password formatted
+//into JSON object
+function loginRoute(userName, password) {
+    var req = new XMLHttpRequest();
+    req.open("POST", "login");
+    req.setRequestHeader("Content-Type", "text/plain");
+    req.send('{"userName":"' + userName + '","password":"' + password + '"}');
+    //to handle the response from the server
+    req.onreadystatechange = function() {
+     	if(req.readyState == 4) {
+        	if (req.status == 200) {
+        		//client has now a valid session cookie, login was successful
+				window.location.assign("/")        	}
+        	else {
+        		//login failed, retry with another password/username
+        		$('.loginError').css('display', 'block').html('<h1>Error!</h1><br /><h3>Login Credentials were rejected! Please try again or contact the web administrator!</h3>');	
+        	} 	
+   		}
+
+
+    }
+}
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Initilise function to start application onload.
@@ -271,6 +294,30 @@ function init() {
     $('.questions').html('');
 	getResponse();
 	alert('load');
+	
+	// Event handler for submit login button.
+	$("#loginButton").click(function(event) {
+			// Get data form question input element. 
+			userName = $("#userName").val().trim();
+			password = $("#userPassword").val().trim();
+			
+			//Send a post request to '/login/' with the body of request in JSON
+			//formatted, for example: '{"userName":"edwin", "password":"notActually"}'
+			loginRoute(userName, password);
+			
+			// sendQuestion(entry);
+			// // Clear textbox
+			// $('#q_id').val('');
+
+			// // Capture a timestamp using the date() object.
+			// rep_time = new Date().toString().trim();
+			// date = rep_time.toString();
+			// console.log(date);
+			// //sendTimeStamp();
+
+	});
+		
+
 	// Event handler for new question submission.
 	$("#q_submit").click(function(event) {
 			// Get data form question input element. 

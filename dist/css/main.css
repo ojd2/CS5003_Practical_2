@@ -556,3 +556,10 @@ table.dataTable thead .sorting:after {
 .hide {
     display: none;
 }
+
+.loginError {
+    margin: 20px 0;
+    padding: 15px;
+    text-align: center;
+    display: none;
+}

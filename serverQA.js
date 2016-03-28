@@ -233,10 +233,10 @@ function login(req, res) {
                 user_info["userNames"][userName]["password"] === password) {
         // -- Response Logic -------------------------------------------             
             res.cookie("session", user_info["userNames"][userName]["sessionCookie"]);
-            res.send(null);
+            res.status(200).send(null);
         }
         else {
-            res.send("Error: invalid login credentials. Try posting to /login with this as the body {\"userName\":\"edwin\", \"password\":\"notActually\"}")
+            res.status(404).send("Error: invalid login credentials. Try posting to /login with this as the body {\"userName\":\"edwin\", \"password\":\"notActually\"}")
         }
         // -- End of response logic ------------------------------------       
     });
