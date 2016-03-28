@@ -336,10 +336,13 @@ app.get('/questions/', listQuestions);
 app.post('/questions/', addQuestion);
 
 
-//send question id, return replies as JSON
-// If wrong q_id, or incorrect query, then get an 
-// error message as response.  However,
-//listReplies is CURRENTLY BROKEN
+/** 
+*   Responds to path /reply. If query ?q_id=<integer> parameter matches a
+*   question id, responds with an array of replies for that q_id, and a 
+*   status code of 200. If no query supplied (status code 400), or query is 
+*   wrongly formatted (status code 400), or no such q_id exists (status code 
+*   404), then response is a error message (string).
+*/
 app.get('/reply\?q_id=\w+|reply/', listReplies);
 
 //add a reply to a question, need to supply question id  
