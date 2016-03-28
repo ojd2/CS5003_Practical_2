@@ -191,7 +191,9 @@ function getResponse() {
     req.setRequestHeader("Content-Type", "text/plain");
     req.onreadystatechange = function() {
         // Call sorting method for our parsed response.
-    	orderKeys(JSON.parse(req.responseText));
+    	if (req.readyState == 4) {
+    		orderKeys(JSON.parse(req.responseText));
+   		}
     }
     req.send(null);
 }
@@ -203,14 +205,14 @@ function getResponse() {
 function getQuestion() {
     req = new XMLHttpRequest();
     req.open("GET", "questions");
-    req.setRequestHeader("Content-Type", "text/plain");
-    req.send(null);
+    req.setRequestHeader("Content-Type", "text/plain");    
     req.onreadystatechange = function() {
   		if (req.readyState == 4) {
   			displayQuestion(JSON.parse(req.responseText));
   		}
   		// Call displayQuestion whilst parsing our objects.
     }
+    req.send(null);
     
 }
 // ----------------------------------------------------------------------
@@ -240,9 +242,10 @@ function sendReply(){
     req.setRequestHeader("Content-Type", "text/plain");
     req.send('{"q_id":"'+q_id+'","reply":"'+rep_val+'"}');
     req.onreadystatechange = function() {
-    	alert('inside sendReply');
-    	getReply();
-    	
+ 	  	if (req.readyState == 4) {
+    		alert('inside sendReply');
+    		getReply();
+    	}
     }
 }
 // ----------------------------------------------------------------------
@@ -257,7 +260,9 @@ function sendQuestion(question){
     req.setRequestHeader("Content-Type", "text/plain");
     req.onreadystatechange = function() {
         //console.log(req.responseText);
-     	getQuestion();
+     	if (req.readyState == 4) {
+     		getQuestion();     		
+     	}
     }
     req.send(question);
 
