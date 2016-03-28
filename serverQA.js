@@ -116,6 +116,9 @@ function updateqa_db(entryID, questions) {
 
 /* 
 * Add a new reply to a question identified by q_id body of request
+* ERROR: 
+*   -   var replies = questions["question_data"][q_id]["replies"];
+*   -   TypeError: Cannot read property 'replies' of undefined
 */
 function addReply(req, res) {
     //supply post request in body a JSON object with a q_id and a reply text

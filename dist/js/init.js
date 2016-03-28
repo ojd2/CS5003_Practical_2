@@ -14,6 +14,35 @@ var container, question, reply, inner_q, panel_q, header_q, inner_panel,
 rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
  q_title, q_meta, q_id, date, userName, password;
 
+/*
+*	Attach event handler to all reply submit buttons to capture reply 
+*	to a question. Call function after replies have been added to HTML DOM.
+*/
+function addReplyHandlers() {
+	// Event handler for a replying to a question.
+	$(".rep_submit").click(function(event) {
+		// Finally, we can grab the value of the 
+		// textbox. We store the value inside the 
+		// value 'rep_val'. 
+		// Here we, get value and trim white spaces.
+		
+		q_id = $(this).closest('li').find('#q_id').html().trim();
+
+		rep_val = $(this).closest("li").find(".rep_textbox").val().trim().toString();
+		console.log(q_id+':'+ rep_val);
+		 
+		
+		// Call the sendReply method.       
+		sendReply();
+		// Call the sendTimeStamp method.
+		//sendTimeStamp();
+		// Clear textbox
+		$('.rep_textbox').val('');
+		// Reload after submit.
+		// location.reload();
+	});
+}
+
 function displayReplies(objects) {
  // For identifying which question
  // has a reply, we must identify
@@ -50,7 +79,7 @@ function displayReplies(objects) {
 	// objects without being sorted.
 
 	
-	alert('inside displayReplies()');
+	//alert('inside displayReplies()');
 	//console.log(objects);
 	var obj = [];
 	obj.push(objects);
@@ -113,10 +142,22 @@ function displayAll(objects) {
 			  	'</span> <b>Submitted:</b> <span id="q_time"> '+
 			  	objects[k].submitTime +
 			  	'</span></div>' +
-			  	'<div class="question_summary"><b class="rep_title">Replies:</b> <div class="q_replies">' +
+			  	'<div class="question_summary"><b class="rep_title">Replies:</b> <div class="q_replies">';
+
 			  	// '<p id="rep_text">' + 
 			  	// replies go in here
 			  	// '</p>' +
+			  	// objects[k].replies + '<br />' +
+			  	if (objects[k].replies !== undefined) {
+			  		for (var e = 0; e < objects[k].replies.length; e++) {
+			  			question.innerHTML += objects[k].replies[e] + '<br />';
+			  		}
+			  	}
+			  	else {
+			  		question.innerHTML += '<p>No replies have yet been submitted.</p>';
+			  	}
+
+			  	question.innerHTML += 
 			  	'</div></div>' + 
 			  	'</div>' + 
 			  	'</div>' + 
@@ -176,9 +217,12 @@ function orderKeys(objects) {
    	});
  	
    	// Call to our display method for
-   	// the sorted associative array.
+   	// the sorted associative array, 
+   	// and then attach event handlers
    	displayAll(sorted);
    	displayReplies(sorted);
+   	addReplyHandlers();
+
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -243,8 +287,8 @@ function sendReply(){
     req.send('{"q_id":"'+q_id+'","reply":"'+rep_val+'"}');
     req.onreadystatechange = function() {
  	  	if (req.readyState == 4) {
-    		alert('inside sendReply');
-    		getReply();
+    		//refresh the question panel.
+    		getResponse();
     	}
     }
 }
@@ -265,8 +309,6 @@ function sendQuestion(question){
      	}
     }
     req.send(question);
-
-
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -346,46 +388,7 @@ function init() {
 
 	});
 	
-	// Event handler for a replying to a question.
-	$(".rep_textbox").keypress(function(event) {
-			// alert('inside rep_submit click');	
-			if ( $('.rep_textbox:focus').length > 0 ) {
-			// Identify parent HTML element.
-			// This would be our <li> element.
-			var $textarea = $('.rep_textbox'),
-    		$parent = $textarea.parent();
-    		console.log($parent);
-			
-			// Here we search within the parent for 
-			// the unique id number of the proposed
-			// question. We store this in a value 
-			// called 'q_id'. We also search for the 
-			// textarea within the selected parent.
-			// This way we can capture multiple changes
-			// on the go. We store the reply values in 
-			// a value called 'rep_val'.
-			q_id = $(this).closest('li').find('#q_id').html().trim();
-			}
-		});
 
-	$(".rep_submit").click(function(event) {
-			// Finally, we can grab the value of the 
-			// textbox. We store the value inside the 
-			// value 'rep_val'. 
-			// Here we, get value and trim white spaces.
-			rep_val = $(this).closest("li").find(".rep_textbox").val().trim().toString();
-			console.log(q_id+':'+ rep_val);
-			 
-			
-			// Call the sendReply method.       
-			sendReply();
-			// Call the sendTimeStamp method.
-			//sendTimeStamp();
-			// Clear textbox
-			$('.rep_textbox').val('');
-			// Reload after submit.
-			// location.reload();
-	});
 }
 
 $(init);
