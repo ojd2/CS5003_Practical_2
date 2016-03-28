@@ -20,34 +20,36 @@ var qa_db = nano.db.use('questions'); // Reference to the database storing the t
 var user_db = nano.db.use('usernames'); //Reference to the database storing usernames and passwords
 // var session_db = nano.db.use('sessions'); //Reference to the database storing live sessions and usernames
 
-/** CURRENTLY BROKEN
+/** 
 *   Lists all replies to question identified by q_id 
-*   in parameter of GET request. Should test for 
-*   session cookie.  
+*   in parameter of GET request. 
+*   Upgrades: Should test for session cookie.  
 */
 function listReplies(req, res) {
-    //req.originalUrl;
-    //req.query.q_id;
+    //Helpful code to use: req.originalUrl or req.query.q_id;
     var q_id = req.query.q_id;
-    //console.log(req.query);
-
-    if (req.path.match(/reply/) == "reply"){
-        console.log('into reply if statement');
-       res.send("Error. No q_id parameter supplied. Path should be /reply/?q_id=value");  
+    
+    if (req.originalUrl.match(/reply\?q_id=\d+/) === null) {
+        res.status(400).send("Error. To get a list of replies for a question, use the following" +  
+            "GET request path: /reply?q_id=<integer> where <integer> is replaced by the" + 
+            "an integer corresponding to the question ID replies are being sought for.");  
     }
-
-    //call db for questions doc, then find replies. 
-    qa_db.get('question_info', { revs_info : true }, function (err, dbDoc) {
-        var replies = dbDoc["question_data"][q_id]["replies"];
-        
-        //to catch bad q_id not in database
-        if (replies == undefined) {
-            res.json(replies);
-        }
-        else {
-            res.send('q_id does not match any question in the db');
-        }
-    });
+    else {
+        //call db for questions doc, then find replies. 
+        qa_db.get('question_info', { revs_info : true }, function (err, dbDoc) {
+            if (dbDoc["question_data"][q_id] === undefined) {
+                res.status(404).send('That q_id does not match any question in the db! Try another integer?');
+            }
+            else if (dbDoc["question_data"][q_id]["replies"] === undefined) {
+                //we have said q_id, but no replies as of yet. Return empty array.
+                res.status(200).send([]);
+            }
+            else {
+                var replies = dbDoc["question_data"][q_id]["replies"];
+                res.status(200).json(replies);
+            }
+        });
+    }
 }
 
 // List all the questions information as JSON, test for valid session. 
@@ -125,7 +127,7 @@ function addReply(req, res) {
     if (!err) {
         //should be an array of replies, or undefined;
         var replies = questions["question_data"][q_id]["replies"];
-        if (replies == undefined) {
+        if (replies === undefined) {
             questions["question_data"][q_id]["replies"] = [];
             replies = questions["question_data"][q_id]["replies"];
             console.log('into if statement');
@@ -334,10 +336,13 @@ app.get('/questions/', listQuestions);
 app.post('/questions/', addQuestion);
 
 
-//send question id, return replies as JSON
-// If wrong q_id, or incorrect query, then get an 
-// error message as response.  However,
-//listReplies is CURRENTLY BROKEN
+/** 
+*   Responds to path /reply. If query ?q_id=<integer> parameter matches a
+*   question id, responds with an array of replies for that q_id, and a 
+*   status code of 200. If no query supplied (status code 400), or query is 
+*   wrongly formatted (status code 400), or no such q_id exists (status code 
+*   404), then response is a error message (string).
+*/
 app.get('/reply\?q_id=\w+|reply/', listReplies);
 
 //add a reply to a question, need to supply question id  
