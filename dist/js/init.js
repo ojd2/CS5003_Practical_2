@@ -111,7 +111,7 @@ function displayAll(objects) {
 			  	'</span> <b>ID:</b> <span id="q_id"> '+
 			  	k +
 			  	'</span> <b>Submitted:</b> <span id="q_time"> '+
-			  	date +
+			  	objects[k].submitTime +
 			  	'</span></div>' +
 			  	'<div class="question_summary"><b class="rep_title">Replies:</b> <div class="q_replies">' +
 			  	// '<p id="rep_text">' + 
