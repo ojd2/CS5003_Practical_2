@@ -10,9 +10,9 @@ var req, data, user;
 //	Next, begin with some global HTML vars.
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-var container, question, reply, inner_q, panel_q, header_q, inner_panel, rep_q,
-rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test, q_title, q_meta, q_id,
-date, userName, password;
+var container, question, reply, inner_q, panel_q, header_q, inner_panel, 
+rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
+ q_title, q_meta, q_id, date, userName, password;
 
 function displayReplies(objects) {
  // For identifying which question
@@ -204,11 +204,14 @@ function getQuestion() {
     req = new XMLHttpRequest();
     req.open("GET", "questions");
     req.setRequestHeader("Content-Type", "text/plain");
-    req.onreadystatechange = function() {
-  		// Call displayQuestion whilst parsing our objects.
-        displayQuestion(JSON.parse(req.responseText));
-    }
     req.send(null);
+    req.onreadystatechange = function() {
+  		if (req.readyState == 4) {
+  			displayQuestion(JSON.parse(req.responseText));
+  		}
+  		// Call displayQuestion whilst parsing our objects.
+    }
+    
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -260,9 +263,13 @@ function sendQuestion(question){
 
 
 }
-
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 //Open a post request to path /login, with userName and password formatted
-//into JSON object
+//into JSON object. If successful login, reload client browser to path '/'
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+
 function loginRoute(userName, password) {
     var req = new XMLHttpRequest();
     req.open("POST", "login");
@@ -273,19 +280,21 @@ function loginRoute(userName, password) {
      	if(req.readyState == 4) {
         	if (req.status == 200) {
         		//client has now a valid session cookie, login was successful
-				window.location.assign("/")        	}
+				window.location.assign("/");
+			}
         	else {
         		//login failed, retry with another password/username
-        		$('.loginError').css('display', 'block').html('<h1>Error!</h1><br /><h3>Login Credentials were rejected! Please try again or contact the web administrator!</h3>');	
+        		$('.loginError').css('display', 'block').html('<h1>Error!</h1><br' +
+        		' /><h3>Login Credentials were rejected! Please try again or contact' +
+        		' the web administrator!</h3>');	
         	} 	
    		}
-
-
     }
 }
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-// Initilise function to start application onload.
+// Initialise function to start application onload.
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 function init() {
@@ -293,27 +302,22 @@ function init() {
 	// Clear empty.
     $('.questions').html('');
 	getResponse();
-	alert('load');
+	//alert('load');
 	
 	// Event handler for submit login button.
 	$("#loginButton").click(function(event) {
-			// Get data form question input element. 
-			userName = $("#userName").val().trim();
-			password = $("#userPassword").val().trim();
-			
-			//Send a post request to '/login/' with the body of request in JSON
-			//formatted, for example: '{"userName":"edwin", "password":"notActually"}'
-			loginRoute(userName, password);
-			
-			// sendQuestion(entry);
-			// // Clear textbox
-			// $('#q_id').val('');
+		// Get data from userName and password input elements when submit button
+		// is clicked by the user on login.html
+		userName = $("#userName").val().trim();
+		password = $("#userPassword").val().trim();
+		
+		//Send a post request to '/login/' with the body of request in JSON
+		//formatted like this example: '{"userName":"edwin", "password":"notActually"}'
+		loginRoute(userName, password);
 
-			// // Capture a timestamp using the date() object.
-			// rep_time = new Date().toString().trim();
-			// date = rep_time.toString();
-			// console.log(date);
-			// //sendTimeStamp();
+		//if loginRoute is successful, a cookie will be stored on the client browser and
+		//loginRoute will redirect the client browser to path '/' where page.html will 
+		//be served.
 
 	});
 		
@@ -321,17 +325,19 @@ function init() {
 	// Event handler for new question submission.
 	$("#q_submit").click(function(event) {
 			// Get data form question input element. 
-			var entry = $("#q_id").val();
-			// Send a post request to the server to add question to db
-			sendQuestion(entry);
-			// Clear textbox
-			$('#q_id').val('');
-
-			// Capture a timestamp using the date() object.
-			rep_time = new Date().toString().trim();
-			date = rep_time.toString();
-			console.log(date);
-			//sendTimeStamp();
+			var entry = $("#userQuestion").val();
+			if (entry.length === 0) {
+				$('#userQuestion').attr('placeholder', 'You cannot submit a blank question!');
+				$('.q_container').addClass('has-error').css('border', '1px solid red');
+			}
+			else {
+				// Send a post request to the server to add question to db
+				sendQuestion(entry);
+				// Clear textbox, set values back (as-was) before any errors.
+				$('#userQuestion').val('');	
+				$('#userQuestion').attr('placeholder', 'Write your question here.');
+				$('.q_container').removeClass('has-error').css('border', 'none');						
+			}
 
 	});
 	
