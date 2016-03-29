@@ -628,7 +628,7 @@ table.dataTable thead .sorting:after {
 
 .badge {
     background:#949499 !important;
-    color:white;
+    color:#fff;
     font-weight: lighter;
 }
 

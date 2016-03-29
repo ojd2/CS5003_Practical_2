@@ -49,7 +49,7 @@ function addReplyHandlers() {
 */
 function addTagHandlers() {
 	// Event handler for adding / removing tags to a question
-	// via clicking 'edit_tag' span. 
+	// via clicking the 'edit_tag' span. 
 	$('.edit_tag').click(function(event) {
 		// We display a dropdown animation for showing
 		// our input box and appedning to HTML inside the parent container.
