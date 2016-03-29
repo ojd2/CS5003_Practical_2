@@ -63,9 +63,9 @@ nano.db.create('questions', function (err, body) {
 //---------------------------------------------------
 var userID = { "next_user" : 4 };
 var init_userNames = {"userNames":{
-                        "edwin": {"password": "notActually", "sessionCookie": "edwinCookie"},
-                        "donal": {"password": "justAnother", "sessionCookie": "donalCookie"},
-                        "ollie": {"password": "camelCase", "sessionCookie":"ollieCookie"},
+                        "edwin": {"password": "notActually", "sessionCookie": "edwinCookie", "email":"ecb10@st-andrews.ac.uk"},
+                        "donal": {"password": "justAnother", "sessionCookie": "donalCookie", "email":"ddm4@st-andrews.ac.uk"},
+                        "ollie": {"password": "camelCase", "sessionCookie":"ollieCookie", "email":"ojd2@st-andrews.ac.uk"},
                     }};
 //would be a good idea to hash the passwords
 nano.db.destroy('usernames', function (err, body) {

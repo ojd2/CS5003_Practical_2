@@ -116,6 +116,9 @@ function updateqa_db(entryID, questions) {
 
 /* 
 * Add a new reply to a question identified by q_id body of request
+* ERROR: 
+*   -   var replies = questions["question_data"][q_id]["replies"];
+*   -   TypeError: Cannot read property 'replies' of undefined
 */
 function addReply(req, res) {
     //supply post request in body a JSON object with a q_id and a reply text
@@ -233,10 +236,10 @@ function login(req, res) {
                 user_info["userNames"][userName]["password"] === password) {
         // -- Response Logic -------------------------------------------             
             res.cookie("session", user_info["userNames"][userName]["sessionCookie"]);
-            res.send(null);
+            res.status(200).send(null);
         }
         else {
-            res.send("Error: invalid login credentials. Try posting to /login with this as the body {\"userName\":\"edwin\", \"password\":\"notActually\"}")
+            res.status(404).send("Error: invalid login credentials. Try posting to /login with this as the body {\"userName\":\"edwin\", \"password\":\"notActually\"}")
         }
         // -- End of response logic ------------------------------------       
     });

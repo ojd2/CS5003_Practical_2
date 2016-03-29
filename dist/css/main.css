@@ -394,6 +394,11 @@ table.dataTable thead .sorting:after {
     padding: 15px;
 }
 
+.question_panel {
+    padding:10px 0px;
+    display:block;
+}
+
 .question-replies {
     padding-left:30px;
 }
@@ -426,19 +431,37 @@ table.dataTable thead .sorting:after {
 }
 
 .question_meta {
-    float:left;
     margin:0 auto;
-    width:100%;
-    font-size:16px;
+    width:60%;
+    font-size:12px;
     display: block;
     position: relative;
     padding:10px 20px;
+    margin:10px 20px;
     font-family: Georgia, Times New Roman;
+    background: #F1EEEA;
+    border-radius:3px;
+}
+
+.question_tags {
+    margin:0 auto;
+    width:60%;
+    font-size:12px;
+    display: block;
+    position: relative;
+    padding:0px 10px;
+    margin:10px 20px;
 }
 
 .rep_textbox {
     margin:10px 40px;
     width: 90%;
+}
+
+.rep_title {
+    display:block;
+    margin:0 auto;
+    padding:0px 40px;
 }
 
 #login-splash {
@@ -499,11 +522,20 @@ table.dataTable thead .sorting:after {
     font-weight:lighter;
 }
 
-.btn-default {
-    background:#282627;
-    color:white;
+.btn-tag {
+    background: #cdd1d6;
+    color: #333;
+    margin: 0px 0px 12px 22px;
+    border:1px solid #cdd1d6;
+    font-size:12px;
 }
 
+.btn-tag:hover {
+    background: #8df9ff;
+    color: #333;
+    border:1px solid #8df9ff;
+    font-size:12px;
+}
 .panel-default {
    border-color:#949499 !important; 
 }
@@ -548,11 +580,76 @@ table.dataTable thead .sorting:after {
     color:#4D5369;
 }
 
-.no_rep {
-    color:#333;
-    font-size:12px;
-}
-
 .hide {
     display: none;
+}
+
+.loginError {
+    margin: 20px 0;
+    padding: 15px;
+    text-align: center;
+    display: none;
+}
+.q_reply {
+    color:#425057;
+    font-size:14px;
+    padding: 15px 50px;
+    font-style: italic;
+    margin:0 auto;
+}
+
+.q_no_rep {
+    color:#425057;
+    font-size:14px;
+    padding: 5px 50px;
+    font-style: italic;
+}
+
+.q_rep_meta {
+    margin: 0 50px;
+    padding: 5px 10px;
+    width: 50%;
+    display:block;
+    background:#b5b2aa !important;
+    color:#fff;
+    font-size:12px;
+    border-radius:3px;
+}
+
+.q_rep_info {
+    padding:0 15px 0px 0px;
+    display:inline-block;
+}
+
+.q_info {
+    padding:0 15px 0px 0px;
+    display:inline-block;
+}
+
+.badge {
+    background:#949499 !important;
+    color:white;
+    font-weight: lighter;
+}
+
+.edit_tag {
+    margin:0px 20px 20px ;
+    cursor:pointer;
+}
+
+.edit_tag:hover {
+    background: #ccc !important;
+    color: #333;
+}
+.tags_container {
+    margin:0 5px;
+}
+
+.show_tags {
+    margin:10px 0px;
+    display:none;
+}
+
+.btn-default {
+    background:#ffeb57;
 }
