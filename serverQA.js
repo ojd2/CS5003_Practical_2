@@ -20,12 +20,19 @@ var nano = require('nano')('http://ddm4:4hrH9Pmb@pc3-037-l.cs.st-andrews.ac.uk:2
 
 var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks
 var user_db = nano.db.use('usernames'); //Reference to the database storing usernames and passwords
-// var session_db = nano.db.use('sessions'); //Reference to the database storing live sessions and usernames
+
+/**
+*   Translate cookie into username. Very silly function. Presumes all cookie come in form:
+*   '<usernameValue>Cookie' that is present in session cookie in client browser.
+*/
+function readCookie(req) {
+    var cookie = req.cookies.session;
+    return cookie.slice(0,-6);
+}
 
 /** 
 *   Lists all replies to question identified by q_id 
 *   in parameter of GET request. 
-*   Upgrades: Should test for session cookie.  
 */
 function listReplies(req, res) {
     //Helpful code to use: req.originalUrl or req.query.q_id;
@@ -117,17 +124,21 @@ function updateqa_db(entryID, questions) {
 }
 
 /* 
-* Add a new reply to a question identified by q_id body of request
-* ERROR: 
-*   -   var replies = questions["question_data"][q_id]["replies"];
-*   -   TypeError: Cannot read property 'replies' of undefined
+*   Add a new reply to a question identified by q_id body of request.
+*   Replies is an array within the question's object in the question db.
+*   At each index of reply array is a reply. A reply is an object literal.
+*   Structured like: {"text": r<eply>, "userName":<userName>, "submitTime":<dateJSON>};
 */
 function addReply(req, res) {   
     //supply post request in body a JSON object with a q_id and a reply text
     req.body = JSON.parse(req.body);
     var q_id = req.body.q_id;
     var reply = req.body.reply;
-    console.log('before any santising: ' + reply);
+    var replyDate = new Date();
+    replyDate = replyDate.toJSON();
+    var replyObj;
+    var userName = readCookie(req);
+
     //sanitise reply input here
     reply = sanitizer.escape(reply);
     reply = sanitizer.sanitize(reply); 
@@ -141,8 +152,9 @@ function addReply(req, res) {
             replies = questions["question_data"][q_id]["replies"];
 
         }
-        replies.push(reply);
-        console.log("question: " + q_id + " had a reply added: " + reply);
+        replyObj = {"text": reply, "userName":userName, "submitTime":replyDate};
+        replies.push(replyObj);
+        console.log("question: " + q_id + " had a reply added: " + replyObj);
                 
         // Add the new data to CouchDB (separate function since
         // otherwise the callbacks get very deeply nested!)
@@ -158,14 +170,11 @@ function addReply(req, res) {
 * Add a new question with the next question id (entryID).
 *    Needs to do: 
 *    Adds a new question to the DB. Looks into body of 
-*    post, and adds this as the question. Still a stub.
-*    Only adds questions as user 'edwin'. However,
-*    Upgrades to come: 
-*    Provided user is logged in, reads session cookie,
-*    works out who the user is, and adds appropriately 
+*    post, and adds this as the question.  
 */
 function addQuestion(req, res) {
     var question = req.body;
+    var userName = readCookie(req);
     //santise question here
 
     qa_db.get('entryID', { revs_info : true }, function (err, entryID) {
@@ -175,9 +184,9 @@ function addQuestion(req, res) {
                 if (!err) {
                     var now = new Date();
                     var jsonDate = now.toJSON();
-                    questions["question_data"][next_entry] = { user: "edwin", question: question, submitTime:jsonDate};
+                    questions["question_data"][next_entry] = { user: userName, question: question, submitTime:jsonDate};
                     entryID["next_entry"] = next_entry + 1;
-                    console.log("user edwin submitted question: " + question);
+                    console.log(userName + " submitted question: " + question);
                     // Add the new data to CouchDB (separate function since
                     // otherwise the callbacks get very deeply nested!)
                     updateqa_db(entryID, questions);
