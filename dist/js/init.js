@@ -16,6 +16,20 @@ rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
  q_title, q_meta, q_id, date, userName, password, tag_value, search_value;
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+// Attach event handler to capture tag text and call a request 
+// to pull in questions with the same tag.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function addTagCallHandler() {
+
+	$(".btn-tag").click(function(event) {
+		alert('inside tag handler');
+		tag_text = $(this).val();
+		getQuestionsByTag(tag_text);
+	});
+}
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // Attach event handler to capture search term from search input area.
 // Triggers an algorithm to search through questions and find matches.
 // ----------------------------------------------------------------------
@@ -270,6 +284,7 @@ function orderKeys(objects) {
    	addReplyHandlers();
    	addTagHandlers();
    	addSearchHandler();
+   	addTagCallHandler();
 
 }
 // ----------------------------------------------------------------------
@@ -305,7 +320,24 @@ function getQuestion() {
     }
     req.send(null);
 }
-
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Retrieve the question by matching with a particular tag using 
+// AJAX request.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function getQuestionsByTag(tag) {
+    req = new XMLHttpRequest();
+    var url = "tags?tag=" + tag;
+    req.open("GET", url);
+    req.setRequestHeader("Content-Type", "text/plain");    
+    req.onreadystatechange = function() {
+  		if (req.readyState == 4) {
+  			displayQuestion(JSON.parse(req.responseText));
+  		}
+    }
+    req.send(null);
+}
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a tag by making POST request to node server.
