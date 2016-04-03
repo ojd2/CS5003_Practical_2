@@ -14,29 +14,41 @@ var req, data, user;
 var container, question, reply, inner_q, panel_q, header_q, inner_panel, 
 rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
  q_title, q_meta, q_id, date, userName, password, tag_value, search_value;
-
-
 /*
 *	Attach event handler to capture search term from search input area.
 * 	Triggers an algorithm to search through questions and find matches.
 */
 function addSearchHandler() {
 	$(".search_submit").click(function(event) {
-		alert('trigger search');
-		search_value = $('#search').val().trim().toString();
-		console.log(search_value);
-
-		Object.keys(sorted).reverse().forEach(function(j) {
-			
-			if(sorted[j].question === search_value) {
-				console.log('found question');
-			} else {
-				console.log('not found any matches');
-			}
-		});
-
-
-	});
+		var searchTerm = $('#search').val(); //val of search bar
+ 		var regExp = new RegExp(searchTerm, "i"); //regular experation
+ 		var results = {};
+        // For iteration over JSON objects.
+        $.each(sorted, function(key, val){
+            if(val.question !== undefined) { 
+            	if(val.question.search(regExp) !== -1) {
+     				console.log(val.question);
+     				console.log(val);
+     				results[key] = val;	
+            	} 
+            }
+        });
+        // Replies JSON structure.
+        $.each(sorted, function(key, val){
+        	if(val.replies !== undefined) {
+        		for(var i = 0; i < val.replies.length; i++) {
+        			var text = val.replies[i].text;
+        			if(text.match(regExp) && results[i] === undefined) {
+        				results[key] = val;
+        			} 
+        		}
+        	}	
+        });
+        // Clear html for 'search_container'
+        $('.search_container').html('');    
+        // Call displayAll() on new returned objects. 	
+        displayAll(results);
+    });
 }
 /*
 *	Attach event handler to all reply submit buttons to capture reply 
@@ -132,7 +144,7 @@ function displayQuestion(objects) {
 // Function to retrieve response & appended all questions to HTML question.
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-function displayAll(objects) {
+function displayAll(objects, search) {
 		// Clear empty.
     	$('.questions').html('');
         	// Here we use the Object.key Prototype method
@@ -229,6 +241,17 @@ function displayAll(objects) {
 				$(rep_text).appendTo(question);
 				$(rep_q).appendTo(question);	
 			});
+
+			if (Object.keys(objects).length === 0) {
+				$('.panel-heading').html('<i class="fa fa-clock-o fa-fw"></i> Search Results... ');
+				$('.search_container').html('<h3 style="color:#fff;">Sorry, no matches were returned!</h3>');
+				
+			}
+			// else {
+			// 	console.log('displayAll question obj is not empty');
+			// 	console.log(objects);
+			// }
+
 
 }
 
