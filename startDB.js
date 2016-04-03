@@ -9,7 +9,7 @@
 // couchdb-setup
 //
 // NOTE: *NOT* your school/university username and password!
-var nano = require('nano')('http://127.0.0.1:5984');
+var nano = require('nano')('http://ddm4:WTs7FPTK@pc2-090-l.cs.st-andrews.ac.uk:20049');
 
 // our application's model, populated with one entry
 var entryID = { "next_entry" : 10 };

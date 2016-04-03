@@ -10,11 +10,12 @@ var express = require('express');
 var json = require('express-json');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var sanitizer = require('sanitizer');
 
 // You will also need to replace the server name with the details given by
 // couchdb. Will need to include password and user name if this is setup in couchdb
 // "http://user:password@addressToCouchdb"
-var nano = require('nano')('http://127.0.0.1:5984');
+var nano = require('nano')('http://ddm4:WTs7FPTK@pc2-090-l.cs.st-andrews.ac.uk:20049');
 
 var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks
 var user_db = nano.db.use('usernames'); //Reference to the database storing usernames and passwords
@@ -120,11 +121,15 @@ function updateqa_db(entryID, questions) {
 *   -   var replies = questions["question_data"][q_id]["replies"];
 *   -   TypeError: Cannot read property 'replies' of undefined
 */
-function addReply(req, res) {
+function addReply(req, res) {   
     //supply post request in body a JSON object with a q_id and a reply text
     req.body = JSON.parse(req.body);
     var q_id = req.body.q_id;
     var reply = req.body.reply;
+    console.log('before any santising: ' + reply);
+    //sanitise reply input here
+    reply = sanitizer.escape(reply);
+    reply = sanitizer.sanitize(reply); 
 
     qa_db.get('question_info', { revs_info : true }, function (err, questions) {
     if (!err) {
@@ -133,7 +138,6 @@ function addReply(req, res) {
         if (replies === undefined) {
             questions["question_data"][q_id]["replies"] = [];
             replies = questions["question_data"][q_id]["replies"];
-            console.log('into if statement');
 
         }
         replies.push(reply);
@@ -160,6 +164,8 @@ function addReply(req, res) {
 *    works out who the user is, and adds appropriately 
 */
 function addQuestion(req, res) {
+    var question = req.body;
+    //santise question here
 
     qa_db.get('entryID', { revs_info : true }, function (err, entryID) {
         if (!err) {
@@ -168,9 +174,9 @@ function addQuestion(req, res) {
                 if (!err) {
                     var now = new Date();
                     var jsonDate = now.toJSON();
-                    questions["question_data"][next_entry] = { user: "edwin", question: req.body, submitTime:jsonDate};
+                    questions["question_data"][next_entry] = { user: "edwin", question: question, submitTime:jsonDate};
                     entryID["next_entry"] = next_entry + 1;
-                    console.log("user edwin submitted question: " + req.body);
+                    console.log("user edwin submitted question: " + question);
                     // Add the new data to CouchDB (separate function since
                     // otherwise the callbacks get very deeply nested!)
                     updateqa_db(entryID, questions);
