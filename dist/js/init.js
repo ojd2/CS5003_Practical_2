@@ -14,6 +14,8 @@ var req, data, user;
 var container, question, reply, inner_q, panel_q, header_q, inner_panel, 
 rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
  q_title, q_meta, q_id, date, userName, password, tag_value, search_value;
+
+
 /*
 *	Attach event handler to capture search term from search input area.
 * 	Triggers an algorithm to search through questions and find matches.
@@ -35,15 +37,7 @@ function addSearchHandler() {
 
 
 	});
-
-
-
 }
-
-
-
-
-
 /*
 *	Attach event handler to all reply submit buttons to capture reply 
 *	to a question. Call function after replies have been added to HTML DOM.
@@ -201,8 +195,9 @@ function displayAll(objects) {
 			  	if (objects[k].replies !== undefined) {
 			  		for (var e = 0; e < objects[k].replies.length; e++) {
 			  			var repTime = objects[k].replies[e].submitTime;
-			  			console.log(repTime);
+			  			if(repTime !== undefined) {
 			  			var repTimeFormatted = repTime.toString().replace('T', ' @ ').slice(0,18);
+			  			}
 			  			question.innerHTML += '<p class="q_reply">' + objects[k].replies[e].text + '</p>' + 
 			  			'<div class="q_rep_meta bg-primary"><span class="q_rep_info"><b>User:</b> '  + objects[k].replies[e].userName + '</span>' + 
 			  			'<span class="q_rep_info"> <b>Submitted:</b> ' + repTimeFormatted + '</span>' +
@@ -377,11 +372,15 @@ function loginRoute(userName, password) {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 function init() {
+	// Attach event handler to logout users by deleting cookie.
+	$("#logout").click(function(event) {
+		document.cookie = 'session=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+		window.location.assign('/');
+	});
 	// Display all questions on page load.
 	// Clear empty.
     $('.questions').html('');
 	getResponse();
-	//alert('load');
 	
 	// Event handler for submit login button.
 	$("#loginButton").click(function(event) {
@@ -418,8 +417,5 @@ function init() {
 			}
 
 	});
-	
-
 }
-
 $(init);
