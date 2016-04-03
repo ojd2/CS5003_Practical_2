@@ -14,10 +14,12 @@ var req, data, user;
 var container, question, reply, inner_q, panel_q, header_q, inner_panel, 
 rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
  q_title, q_meta, q_id, date, userName, password, tag_value, search_value;
-/*
-*	Attach event handler to capture search term from search input area.
-* 	Triggers an algorithm to search through questions and find matches.
-*/
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Attach event handler to capture search term from search input area.
+// Triggers an algorithm to search through questions and find matches.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 function addSearchHandler() {
 	$(".search_submit").click(function(event) {
 		var searchTerm = $('#search').val(); //val of search bar
@@ -50,10 +52,12 @@ function addSearchHandler() {
         displayAll(results);
     });
 }
-/*
-*	Attach event handler to all reply submit buttons to capture reply 
-*	to a question. Call function after replies have been added to HTML DOM.
-*/
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+//	Attach event handler to all reply submit buttons to capture reply 
+//	to a question. Call function after replies have been added to HTML DOM.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 function addReplyHandlers() {
 	// Event handler for a replying to a question.
 	$(".rep_submit").click(function(event) {
@@ -80,10 +84,12 @@ function addReplyHandlers() {
 		$('.rep_textbox').val('');
 	});
 }
-/*
-*	Attach event handler to add / remove tags submitted for each question. 
-*	Call function after 'Edit tags' input has been added to HTML DOM.
-*/
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+//	Attach event handler to add / remove tags submitted for each question. 
+//	Call function after 'Edit tags' input has been added to HTML DOM.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 function addTagHandlers() {
 	// Event handler for adding / removing tags to a question
 	// via clicking the 'edit_tag' span. 
@@ -94,7 +100,7 @@ function addTagHandlers() {
 		// Create a variable for our tag HTML area.
 		var tag_area = document.getElementsByClassName("show_tags");
 		// We then append HTML to our tag HTML area.
-		$(tag_area).html('<input type="text" class="tag_entry form-control" placeholder="Choose a topic">' + 
+		$(tag_area).html('<div class="col-xs-4"><input type="text" class="tag_entry form-control" placeholder="Choose a topic"></div>' + 
 		'<button type="button" class="add_tag btn btn-default">Add Topic</button>');
 
 			$('.add_tag').click(function(event) {
@@ -119,13 +125,6 @@ function addTagHandlers() {
 			});
 	});
 }
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// Function to request POST method for question tags.
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// SENDTAG() METHOD TO GO HERE
-// WILL DO THIS ONCE ServerQA.js has been edited accordingly.
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Function to retrieve response & appended question to HTML question.
@@ -188,17 +187,6 @@ function displayAll(objects, search) {
 						question.innerHTML += '<input class="btn btn-default btn-tag" type="button" value="' + objects[k].tags[e] + '">';
 			  		}
 			  	}
-
-				// Begin 'edit tags' HTML area.
-				// question.innerHTML +=
-				// '<div class="tags_container form-inline">' +
-				// '<div class="show_tags col-xs-4 "></div>' +
-				// '</div>' +
-				// '<div class="clearfix"></div>' +
-				// '<span class="edit_tag badge">Edit Topics ' + 
-				// '<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
-				// '</span>';
-
 				question.innerHTML +=
 				'<div class="clearfix"></div>' +
 				'<span class="edit_tag badge">Add Topic ' + 
@@ -251,15 +239,7 @@ function displayAll(objects, search) {
 				$('.search_container').html('<h3 style="color:#fff;">Sorry, no matches were returned!</h3>');
 				
 			}
-			// else {
-			// 	console.log('displayAll question obj is not empty');
-			// 	console.log(objects);
-			// }
-
-
 }
-
-
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Retrieve ALL data then apply sort algorithm.
@@ -276,8 +256,6 @@ function orderKeys(objects) {
  }).forEach(function(v, i) {
        // Push our objects into the 
        // associative array: sorted.
-       //console.log('NOT : ' + v +  ' : ');
- 	   //console.log(objects[v]);
        sorted = objects;
    	});
  	
@@ -324,10 +302,8 @@ function getQuestion() {
   		if (req.readyState == 4) {
   			displayQuestion(JSON.parse(req.responseText));
   		}
-  		// Call displayQuestion whilst parsing our objects.
     }
     req.send(null);
-    
 }
 
 // ----------------------------------------------------------------------
@@ -342,7 +318,7 @@ function sendTag(){
     req.send('{"q_id":"'+q_id+'","tag":"'+tag_value+'"}');
     req.onreadystatechange = function() {
  	  	if (req.readyState == 4) {
-    		//refresh the question panel.
+    		// refresh the question panel.
     		getResponse();
     	}
     }
@@ -365,7 +341,6 @@ function sendReply(){
     	}
     }
 }
-
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a new question by making POST request to node server
@@ -390,7 +365,6 @@ function sendQuestion(question){
 //into JSON object. If successful login, reload client browser to path '/'
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-
 function loginRoute(userName, password) {
     var req = new XMLHttpRequest();
     req.open("POST", "login");
@@ -412,7 +386,6 @@ function loginRoute(userName, password) {
    		}
     }
 }
-
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Initialise function to start application onload.
@@ -439,11 +412,9 @@ function init() {
 		//Send a post request to '/login/' with the body of request in JSON
 		//formatted like this example: '{"userName":"edwin", "password":"notActually"}'
 		loginRoute(userName, password);
-
 		//if loginRoute is successful, a cookie will be stored on the client browser and
 		//loginRoute will redirect the client browser to path '/' where page.html will 
 		//be served.
-
 	});
 		
 	// Event handler for new question submission.
