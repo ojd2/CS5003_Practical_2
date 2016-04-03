@@ -12,7 +12,7 @@ var req, data, user;
 // ----------------------------------------------------------------------
 var container, question, reply, inner_q, panel_q, header_q, inner_panel, 
 rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
- q_title, q_meta, q_id, date, userName, password;
+ q_title, q_meta, q_id, date, userName, password, tag_value;
 
 /*
 *	Attach event handler to all reply submit buttons to capture reply 
@@ -25,73 +25,71 @@ function addReplyHandlers() {
 		// textbox. We store the value inside the 
 		// value 'rep_val'. 
 		// Here we, get value and trim white spaces.
-		
 		q_id = $(this).closest('li').find('#q_id').html().trim();
 
 		rep_val = $(this).closest("li").find(".rep_textbox").val().trim().toString();
 		console.log(q_id+':'+ rep_val);
-		 
-		
-		// Call the sendReply method.       
-		sendReply();
-		// Call the sendTimeStamp method.
-		//sendTimeStamp();
-		// Clear textbox
+		// Conditionals to make sure users cannot submit empty replies.
+		if (rep_val === " " || rep_val === "") {     
+			$('.rep_textbox').css('border', '1px solid red');
+			$('.reply-title').html('Please enter a reply.');
+			return false;
+		}
+		else {
+			// Call the sendReply method if user has entered content into textbox.
+			sendReply();
+		}
+		// Clear textbox upon submit to clear values.
 		$('.rep_textbox').val('');
-		// Reload after submit.
-		// location.reload();
 	});
 }
+/*
+*	Attach event handler to add / remove tags submitted for each question. 
+*	Call function after 'Edit tags' input has been added to HTML DOM.
+*/
+function addTagHandlers() {
+	// Event handler for adding / removing tags to a question
+	// via clicking the 'edit_tag' span. 
+	$('.edit_tag').click(function(event) {
+		// We display a dropdown animation for showing
+		// our input box and appedning to HTML inside the parent container.
+		$(this).parent().find('.show_tags').slideToggle();
+		// Create a variable for our tag HTML area.
+		var tag_area = document.getElementsByClassName("show_tags");
+		// We then append HTML to our tag HTML area.
+		$(tag_area).html('<input type="text" class="tag_entry form-control" placeholder="Choose a topic">' + 
+		'<button type="button" class="add_tag btn btn-default">Add Topic</button>');
 
-function displayReplies(objects) {
- // For identifying which question
- // has a reply, we must identify
- // the unique id of each question
- // inserted into the DB. To do this,
- // we make use of the JSON layout
- // couchDB provides. 
-
- // Each question submitted to the DB,
- // has the following delegated layout:
- 
- // "question_data": {
- //       "1": {
- //           "user": "edwin",
- //           "question": "How do you make pancakes?"
- //       },
- //       "2": {
- //           "user": "edwin",
- //           "question": "What are the films every programmer must watch?"
- //       }
-
- // With this in mind, we can identify
- // each question by using the global
- // object key. In this case it will be 
- // the index number [1,2].
-
- // To fetch the index key numbers
- // we can do a simple for each loop inside
- // the Object.keys() method. However, unlike
- // the sorted method, we do NOT need to 
- // include .reverse().
-
-	// Here we loop through our
-	// objects without being sorted.
-
-	
-	//alert('inside displayReplies()');
-	//console.log(objects);
-	var obj = [];
-	obj.push(objects);
-
-	console.log(obj);
-
-	
-
-	
-
-	// var obj = JSON.parse(objects);
+			$('.add_tag').click(function(event) {
+				// Additionally, we have to collect the question id.
+				// We need this for our POST request method.
+				alert('something');
+				// Capture the value of the tag input area.
+				tag_value = $(this).closest("li").find(".tag_entry").val().trim().toString();
+				// Conditionals to make sure users cannot submit empty replies.
+				if (tag_value === " " || tag_value === "") {     
+					$('.tag_entry').css('border', '1px solid red');
+					$('.tag_entry').attr('placeholder', 'Missing Topic!');
+					return false;
+				}
+				else {
+					console.log('Entered Tag value: ' + tag_value);
+					// Call the sendTag method if user has entered content into input area.
+					//sendTag();
+					//sendTag(tag_value);
+					// Clear values.
+					$('.tag_entry').html('');
+				}
+			});
+	});
 }
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Function to request POST method for question tags.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// SENDTAG() METHOD TO GO HERE
+// WILL DO THIS ONCE ServerQA.js has been edited accordingly.
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Function to retrieve response & appended question to HTML question.
@@ -135,59 +133,68 @@ function displayAll(objects) {
 			  	'<h3 class="question-title"><a href="">' +
 			  	objects[k].question +
 			  	'</a></h3>' + 
-			  	'<div class="question_meta"><b>Username:</b> <span id="q_username"> ' +
+			  	'<div class="question_meta"><span class="q_info"><b>Username:</b> ' +
 			  	objects[k].user +
-			  	'</span> <b>ID:</b> <span id="q_id"> '+
+			  	'</span> <span class="q_info"><b>ID:</b> <span id="q_id">'+
 			  	k +
-			  	'</span> <b>Submitted:</b> <span id="q_time"> '+
+			  	'</span></span> <span class="q_info"><b>Submitted:</b>'+
 			  	objects[k].submitTime +
-			  	'</span></div>' +
-			  	'<div class="question_summary"><b class="rep_title">Replies:</b> <div class="q_replies">';
-
-			  	// '<p id="rep_text">' + 
-			  	// replies go in here
-			  	// '</p>' +
-			  	// objects[k].replies + '<br />' +
+			  	'</span></div>';
+			  	// Begin Question Tags HTML area.
+			  	if (objects[k].user !== undefined) {
+					// Add tags to HTML below.
+					question.innerHTML += '<input class="btn btn-default btn-tag" type="button" value="' + objects[k].user + '">';
+					// Begin 'edit tags' HTML area.
+					question.innerHTML +=
+					'<div class="tags_container form-inline">' +
+					'<div class="show_tags col-xs-4 "></div>' +
+					'</div>' +
+					'<div class="clearfix"></div>' +
+					'<span class="edit_tag badge">Edit Topics ' + 
+					'<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
+					'</span>';
+				} else {
+					question.innerHTML +=
+					'<div class="clearfix"></div>' +
+					'<span class="edit_tag badge">Add Topic ' + 
+					'<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
+					'</span>' +
+					'<div class="show_tags"></div>';
+				}
+				// Begin Replies HTML area.
+			  	question.innerHTML += '<b class="rep_title">Replies:</b>';
 			  	if (objects[k].replies !== undefined) {
 			  		for (var e = 0; e < objects[k].replies.length; e++) {
-			  			question.innerHTML += objects[k].replies[e] + '<br />';
+			  			question.innerHTML += '<p class="q_reply">' + objects[k].replies[e] + '</p>' + 
+			  			'<div class="q_rep_meta bg-primary"><span class="q_rep_info"><b>User:</b> '  + objects[k].user + '</span>' + 
+			  			'<span class="q_rep_info"> <b>Submitted:</b> ' + objects[k].submitTime + '</span>' +
+			  			'</div>';
 			  		}
 			  	}
 			  	else {
-			  		question.innerHTML += '<p>No replies have yet been submitted.</p>';
+			  		question.innerHTML += '<p class="q_no_rep">No replies have yet been submitted for this question.</p>';
 			  	}
 
+			  	// Finish our HTML structure.
 			  	question.innerHTML += 
-			  	'</div></div>' + 
 			  	'</div>' + 
 			  	'</div>' + 
+			  	'</div>' + 
+			  	// Begin our Reply Textarea and Button HTML.
 			  	'<h3 class="reply-title">Submit a reply:</h3>';
-
 			  	// Set up a 'submit reply' button.
 			  	rep_q = document.createElement( "button" );
 			  	rep_q.className = 'rep_submit btn';
 			  	rep_q.innerHTML = 'Submit Reply';
-
 			  	// Set up a 'textbox' for reply.
 			  	rep_text = document.createElement( "textarea" );
 			  	//rep_text.id = 'rep_textbox';
 			  	rep_text.className = 'form-control rep_textbox';
 			  	rep_text.setAttribute('rows', '3');
-			  	
 			  	// Append our HTML to container.
 				$(question).appendTo(container);
 				$(rep_text).appendTo(question);
 				$(rep_q).appendTo(question);	
-				
-				// Call get request for replies now.
-				//getReply();
-
-				// Hide replies if JSON key is not present.
-				// Use some simple HTML DOM manipulation for now.
-				//var t = $('.rep_title');
-				//$('#rep_text:contains("undefined")').html('<p class="no_rep">No replies have been submitted...</p>');
-				
-
 			});
 
 }
@@ -220,8 +227,8 @@ function orderKeys(objects) {
    	// the sorted associative array, 
    	// and then attach event handlers
    	displayAll(sorted);
-   	displayReplies(sorted);
    	addReplyHandlers();
+   	addTagHandlers();
 
 }
 // ----------------------------------------------------------------------
@@ -259,22 +266,6 @@ function getQuestion() {
     req.send(null);
     
 }
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// Retrieve the question list by making an AJAX request.
-// ----------------------------------------------------------------------
-// ----------------------------------------------------------------------
-// function getReply() {
-//     req = new XMLHttpRequest();
-//     req.open("GET", "questions");
-//     req.setRequestHeader("Content-Type", "text/plain");
-//     req.onreadystatechange = function() {
-//   		// Call displayQuestion whilst parsing our objects.
-//   		alert('inside getReply()');
-//         displayReplies(JSON.parse(req.responseText));
-//     }
-//     req.send(null);
-// }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a reply by making POST request to node server.
@@ -368,7 +359,6 @@ function init() {
 
 	});
 		
-
 	// Event handler for new question submission.
 	$("#q_submit").click(function(event) {
 			// Get data form question input element. 
