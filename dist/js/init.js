@@ -4,6 +4,7 @@
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 var response = [];
+var sorted = {};
 var req, data, user;
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
@@ -12,7 +13,36 @@ var req, data, user;
 // ----------------------------------------------------------------------
 var container, question, reply, inner_q, panel_q, header_q, inner_panel, 
 rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
- q_title, q_meta, q_id, date, userName, password, tag_value;
+ q_title, q_meta, q_id, date, userName, password, tag_value, search_value;
+/*
+*	Attach event handler to capture search term from search input area.
+* 	Triggers an algorithm to search through questions and find matches.
+*/
+function addSearchHandler() {
+	$(".search_submit").click(function(event) {
+		alert('trigger search');
+		search_value = $('#search').val().trim().toString();
+		console.log(search_value);
+
+		Object.keys(sorted).reverse().forEach(function(j) {
+			
+			if(sorted[j].question === search_value) {
+				console.log('found question');
+			} else {
+				console.log('not found any matches');
+			}
+		});
+
+
+	});
+
+
+
+}
+
+
+
+
 
 /*
 *	Attach event handler to all reply submit buttons to capture reply 
@@ -123,6 +153,11 @@ function displayAll(objects) {
         	// "What are some must watch films by Krzysztof Zanussi?".
         	// we perform a simple sort again
       		Object.keys(objects).reverse().forEach(function(k) {
+      			// Make timestamp collected from DB readable for humans.
+      			timestamp = objects[k].submitTime;
+      			// A simple replace method to remove and add spacing.
+      			// Additional slice is applied to remove excessive GMT labels and miliseconds.
+      			subTime = timestamp.toString().replace('T', ' @ ').slice(0,18);
       			// Store our question inside the JSON into data.
 				// Create our <li> '.question_container' to append to <ul> 'questions'
 				container = document.getElementsByClassName('questions');
@@ -137,8 +172,8 @@ function displayAll(objects) {
 			  	objects[k].user +
 			  	'</span> <span class="q_info"><b>ID:</b> <span id="q_id">'+
 			  	k +
-			  	'</span></span> <span class="q_info"><b>Submitted:</b>'+
-			  	objects[k].submitTime +
+			  	'</span></span> <span class="q_info"><b>Submitted:</b> '+
+			  	subTime +
 			  	'</span></div>';
 			  	// Begin Question Tags HTML area.
 			  	if (objects[k].user !== undefined) {
@@ -165,9 +200,12 @@ function displayAll(objects) {
 			  	question.innerHTML += '<b class="rep_title">Replies:</b>';
 			  	if (objects[k].replies !== undefined) {
 			  		for (var e = 0; e < objects[k].replies.length; e++) {
-			  			question.innerHTML += '<p class="q_reply">' + objects[k].replies[e] + '</p>' + 
-			  			'<div class="q_rep_meta bg-primary"><span class="q_rep_info"><b>User:</b> '  + objects[k].user + '</span>' + 
-			  			'<span class="q_rep_info"> <b>Submitted:</b> ' + objects[k].submitTime + '</span>' +
+			  			var repTime = objects[k].replies[e].submitTime;
+			  			console.log(repTime);
+			  			var repTimeFormatted = repTime.toString().replace('T', ' @ ').slice(0,18);
+			  			question.innerHTML += '<p class="q_reply">' + objects[k].replies[e].text + '</p>' + 
+			  			'<div class="q_rep_meta bg-primary"><span class="q_rep_info"><b>User:</b> '  + objects[k].replies[e].userName + '</span>' + 
+			  			'<span class="q_rep_info"> <b>Submitted:</b> ' + repTimeFormatted + '</span>' +
 			  			'</div>';
 			  		}
 			  	}
@@ -211,8 +249,6 @@ function orderKeys(objects) {
  // we must sort our objects accordingly.
  // We want to grab all objects simply push
  // our sorted objects into an associative array.
- var sorted = {};
-
  Object.keys(objects).sort(function(a, b) {
   	 	return a - b;
  }).forEach(function(v, i) {
@@ -223,12 +259,17 @@ function orderKeys(objects) {
        sorted = objects;
    	});
  	
-   	// Call to our display method for
-   	// the sorted associative array, 
-   	// and then attach event handlers
+   	// Call display all method for appending questions
+   	// on assosciative array. Data used will be latest
+   	// data from request.
    	displayAll(sorted);
+   	// Next, we can now call our event handler methods.
+   	// These have to be called here because the DOM
+   	// elements manipulated inside the methods are not
+   	// appened until displayAll() is called.
    	addReplyHandlers();
    	addTagHandlers();
+   	addSearchHandler();
 
 }
 // ----------------------------------------------------------------------
