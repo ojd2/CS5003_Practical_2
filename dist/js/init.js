@@ -170,26 +170,30 @@ function displayAll(objects) {
 			  	subTime +
 			  	'</span></div>';
 			  	// Begin Question Tags HTML area.
-			  	if (objects[k].user !== undefined) {
+			  	if (objects[k].tags !== undefined) {
 					// Add tags to HTML below.
-					question.innerHTML += '<input class="btn btn-default btn-tag" type="button" value="' + objects[k].user + '">';
-					// Begin 'edit tags' HTML area.
-					question.innerHTML +=
-					'<div class="tags_container form-inline">' +
-					'<div class="show_tags col-xs-4 "></div>' +
-					'</div>' +
-					'<div class="clearfix"></div>' +
-					'<span class="edit_tag badge">Edit Topics ' + 
-					'<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
-					'</span>';
-				} else {
-					question.innerHTML +=
-					'<div class="clearfix"></div>' +
-					'<span class="edit_tag badge">Add Topic ' + 
-					'<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
-					'</span>' +
-					'<div class="show_tags"></div>';
-				}
+					for (var e = 0; e < objects[k].tags.length; e++) {
+						question.innerHTML += '<input class="btn btn-default btn-tag" type="button" value="' + objects[k].tags[e] + '">';
+			  		}
+			  	}
+
+				// Begin 'edit tags' HTML area.
+				// question.innerHTML +=
+				// '<div class="tags_container form-inline">' +
+				// '<div class="show_tags col-xs-4 "></div>' +
+				// '</div>' +
+				// '<div class="clearfix"></div>' +
+				// '<span class="edit_tag badge">Edit Topics ' + 
+				// '<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
+				// '</span>';
+
+				question.innerHTML +=
+				'<div class="clearfix"></div>' +
+				'<span class="edit_tag badge">Add Topic ' + 
+				'<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
+				'</span>' +
+				'<div class="show_tags"></div>';
+
 				// Begin Replies HTML area.
 			  	question.innerHTML += '<b class="rep_title">Replies:</b>';
 			  	if (objects[k].replies !== undefined) {
