@@ -11,7 +11,7 @@
 // NOTE: *NOT* your school/university username and password!
 var nano = require('nano')('http://ddm4:4hrH9Pmb@pc3-037-l.cs.st-andrews.ac.uk:20049');
 
-// our application's model, populated with one entry
+// our application's model, populated with some entries and tags
 var entryID = { "next_entry" : 10 };
 var init_questions = { "question_data" :
                     {"1": {"user": "edwin", "question": "Is Turkey good for business?", "submitTime":"2016-03-25T17:11:45.385Z"},
@@ -24,7 +24,9 @@ var init_questions = { "question_data" :
                      "8": {"user": "edwin", "question": "Computer interviewing questions and answers.", "submitTime":"2016-03-25T16:12:45.385Z"},
                      "9": {"user": "edwin", "question": "Does a PhD destroy your soul? 32 other reasons to say No!", "submitTime":"2016-03-25T13:12:45.385Z"},
                  } };
-
+var tagKeys = {"tagKeys":{
+                        "politics": [],
+                    }};
 
 
 nano.db.destroy('questions', function (err, body) {
@@ -55,6 +57,16 @@ nano.db.create('questions', function (err, body) {
                 console.log(err);
             }
         })
+
+        taskdb.insert(tagKeys, 'tag_info', function(err, body) {
+            if (!err) {
+                console.log("Initialised Tags:");
+                console.log(body);
+            } else {
+                console.log("Error when initialising Tags");
+                console.log(err);
+            }
+        })        
     }
 });
 
@@ -98,45 +110,3 @@ nano.db.create('usernames', function (err, body) {
         })
     }
 });
-
-// THIS IS PROBABLY NOW REDUNDANT. FIND COOKIES IN  USERNAME DOC INSTEAD
-// //--------------------------------------------------
-// // Set-up Cookie session document
-// //---------------------------------------------------
-// var sessionID = { "next_session" : 2 };
-// var init_session = { "session_data" :
-//                     {"1": {"cookie": "tempUser", "userName": "edwin"},
-//                  } };
-
-// nano.db.destroy('sessions', function (err, body) {
-//    console.log(err);
-// });
-
-// nano.db.create('sessions', function (err, body) {
-//     taskdb = nano.db.use('sessions');
-//     if (!err) {
-        
-//         // Database didn't exist, so populate it with some initial data
-//         taskdb.insert(init_session, 'session_info', function(err, body) {
-//             if (!err) {
-//                 console.log("Initialised session_info:");
-//                 console.log(body);
-//             } else {
-//                 console.log("Error when initialising session_info");
-//                 console.log(err);
-//             }
-//         });
-
-//         taskdb.insert(sessionID, 'sessionID', function(err, body) {
-//             if (!err) {
-//                 console.log("Initialised session ID:");
-//                 console.log(body);
-//             } else {
-//                 console.log("Error when initialising session ID");
-//                 console.log(err);
-//             }
-//         })
-//     }
-// });
-
-

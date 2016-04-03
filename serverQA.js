@@ -18,8 +18,9 @@ var sanitizer = require('sanitizer');
 var nano = require('nano')('http://ddm4:4hrH9Pmb@pc3-037-l.cs.st-andrews.ac.uk:20049');
 
 
-var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks
+var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks and tags
 var user_db = nano.db.use('usernames'); //Reference to the database storing usernames and passwords
+
 
 /**
 *   Translate cookie into username. Very silly function. Presumes all cookie come in form:
@@ -98,11 +99,24 @@ function deleteTask(req, res) {
     });
 }
 
+
 /*
-* Once reply or a tag has been added, updated question doc.
-* Function very much like updateqa_db 
+*   Add updated tags information to Couchdb.
 */
-function updateTEMP(questions) {
+function updateTagInfo(tags) {
+    qa_db.insert(tags, 'tag_info', function(err_t, t) { 
+        console.log("Updated tag_info in CouchDB");
+        //console.log(err_e);
+        console.log(err_t);
+    });
+}
+
+/*
+*   Once reply or a tag has been added to the question data, update question_info 
+*   Function very much like updateqa_db 
+*   Note, does not update tag_info. See updateTaskInfo for that. 
+*/
+function updateQuestionInfo(questions) {
     qa_db.insert(questions, 'question_info', function(err_t, t) { 
         console.log("Added reply or a tag to a question to CouchDB");
         //console.log(err_e);
@@ -122,6 +136,31 @@ function updateqa_db(entryID, questions) {
         });
     });
 }
+
+/*
+*   Grabs Tag list doc from DB, adds tag to list if it doesn't exist. Else
+*   if tag already exists, adds q_id to it's entry
+*/
+function checkTagList(q_id, newTag){
+    //just to make sure newTag is lowercase.
+    var newTag = newTag.toLowerCase();
+    qa_db.get('tag_info', { revs_info : true }, function (err, tags) {
+        if (!err) {
+            //should be an array of replies, or undefined;
+            var tagKeys = tags["tagKeys"];
+            //check if tag already exists, if it doesn't then add to tagKeys
+            if (Object.keys(tagKeys).indexOf(newTag) === -1) {
+                tagKeys[newTag] = [];
+            }
+            //add q_id to the tag array
+            tagKeys[newTag].push(q_id);
+            //call couchDB to insert new version of document.
+            updateTagInfo(tags);
+
+        }
+    });
+}
+
 
 
 /* 
@@ -155,12 +194,14 @@ function addTag(req, res) {
                 //if the tag does not already exist then add to DB and return creation status code
                 tags.push(tag);
                 //add new data to questionDB doc
-                updateTEMP(questions);
+                updateQuestionInfo(questions);
+                //call function have tag included in tag list
+                checkTagList(q_id, tag);
                 console.log("question: " + q_id + " had a tag added: " + tag);
                 res.status(201).send('Tag added to question');
             }
             else {
-                //tag exists, so inform client that tag exists
+                //tag exists in that question already, so inform client that tag exists
                 res.status(301).send('Tag already exists for this question');
             }
         }
@@ -203,7 +244,7 @@ function addReply(req, res) {
                 
         // Add the new data to CouchDB (separate function since
         // otherwise the callbacks get very deeply nested!)
-        updateTEMP(questions);
+        updateQuestionInfo(questions);
 
         res.status(201).send(null);
         }
