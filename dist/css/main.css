@@ -653,3 +653,16 @@ table.dataTable thead .sorting:after {
 .btn-default {
     background:#ffeb57;
 }
+
+.sidebar-tag {
+    background:#FFEB57;
+    margin:5px 0px 5px 30px;
+    font-size:12px;
+    color:#282627;
+    border:1px solid #FFEB57;
+    font-family: Georgia, Times New Roman;
+}
+
+.page-wrapper {
+    color:#fff !important;
+}
