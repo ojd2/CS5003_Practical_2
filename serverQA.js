@@ -99,12 +99,12 @@ function deleteTask(req, res) {
 }
 
 /*
-* Once reply has been added, updated question doc.
+* Once reply or a tag has been added, updated question doc.
 * Function very much like updateqa_db 
 */
 function updateTEMP(questions) {
     qa_db.insert(questions, 'question_info', function(err_t, t) { 
-        console.log("Added reply to a question to CouchDB");
+        console.log("Added reply or a tag to a question to CouchDB");
         //console.log(err_e);
         console.log(err_t);
     });
@@ -123,11 +123,56 @@ function updateqa_db(entryID, questions) {
     });
 }
 
+
+/* 
+*   Add a tag to a question identified by q_id body of request.
+*   Tags is an array within the question's object in the question db.
+*   At each index of tags array there is a uniq tag. A tag is just a string.
+*/
+function addTag(req, res) {   
+    //supply post request in body a JSON object with a q_id and a tag
+    req.body = JSON.parse(req.body);
+    var q_id = req.body.q_id;
+    var tag = req.body.tag.toLowerCase();
+
+    console.log('incoming tag is:' + tag);
+    console.log('incoming q_id is:' + q_id);
+
+    //sanitise reply input here
+    tag = sanitizer.escape(tag);
+    tag = sanitizer.sanitize(tag); 
+
+    qa_db.get('question_info', { revs_info : true }, function (err, questions) {
+        if (!err) {
+            //should be an array of replies, or undefined;
+            var tags = questions["question_data"][q_id]["tags"];
+            if (tags === undefined) {
+                questions["question_data"][q_id]["tags"] = [];
+                tags = questions["question_data"][q_id]["tags"];
+
+            }
+            if (tags.indexOf(tag) === -1) {
+                //if the tag does not already exist then add to DB and return creation status code
+                tags.push(tag);
+                //add new data to questionDB doc
+                updateTEMP(questions);
+                console.log("question: " + q_id + " had a tag added: " + tag);
+                res.status(201).send('Tag added to question');
+            }
+            else {
+                //tag exists, so inform client that tag exists
+                res.status(301).send('Tag already exists for this question');
+            }
+        }
+    });
+}
+
+
 /* 
 *   Add a new reply to a question identified by q_id body of request.
 *   Replies is an array within the question's object in the question db.
 *   At each index of reply array is a reply. A reply is an object literal.
-*   Structured like: {"text": r<eply>, "userName":<userName>, "submitTime":<dateJSON>};
+*   Structured like: {"text": <reply>, "userName":<userName>, "submitTime":<dateJSON>};
 */
 function addReply(req, res) {   
     //supply post request in body a JSON object with a q_id and a reply text
@@ -160,8 +205,7 @@ function addReply(req, res) {
         // otherwise the callbacks get very deeply nested!)
         updateTEMP(questions);
 
-        res.writeHead(201, {'Location' : 'Not sure this is needed?'});
-        res.end();
+        res.status(201).send(null);
         }
     });
 }
@@ -367,6 +411,15 @@ app.get('/reply\?q_id=\w+|reply/', listReplies);
 //add a reply to a question, need to supply question id  
 // in the body of the post request as {"q_id":<VALUE>, "reply":<VALUE>}
 app.post('/reply/', addReply);
+
+/**
+*   Responds to post request to path /tag. Body of post request must be a 
+*   suitably formated JSON object in this format: {"q_id":<VALUE>, "tag":<VALUE>}
+*   If the tag is added to the question, reponse status code = 201. 
+*   If tag already exist in the question, response status code = 301.
+*   All tags are converted to lower case.
+*/
+app.post('/tag/', addTag);
 
 app.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');    
