@@ -31,6 +31,60 @@ function readCookie(req) {
     return cookie.slice(0,-6);
 }
 
+/**
+*   If parameter ?tag=<value> matches a tag in the database, returns a lit of matching questions,
+*   and status code 200.
+*   If tag specified in parameter does not match any tags in database, returns an error merror, and
+*   status code 404.
+*   Otherwise, if query is not formatted correctly or is not present at all, returns a list of 
+*   uniq tags. 
+*/
+function listTags (req, res) {
+    var tag = req.query.tag;
+
+    if (tag === undefined) {
+        //no tag parameter supplied, thus return an array of all the tags 
+        //call tag doc
+        qa_db.get('tag_info', { revs_info : true }, function (err, tags) {
+            var tagArr;
+            tagArr = Object.keys(tags["tagKeys"]);
+            res.status(200).send(tagArr);
+        });
+    }
+
+    else {
+        //find tag in db and return matching questions, not just the q_id!
+        qa_db.get('tag_info', { revs_info : true }, function (err, tags) {
+
+            if (tags.tagKeys[tag] === undefined) {
+                //tag supplied does not match anything in tagKeys, return error
+                res.status(404).send('Tag value supplied as parameter does not match any tag in DB');
+            }
+            else {
+                //array of questions ids that match the supplied tag parameter value
+                var q_idArray = tags.tagKeys[tag];
+
+                //call questions_info document
+                qa_db.get('question_info', { revs_info : true }, function (err, questions) {
+                    //for every qieston in question_data, if key equals a value in q_idArray 
+                    //we want to include this question object in the respond object 
+                    var resultArr = [];
+                    for (var question in questions["question_data"]) {
+                        
+                        if(q_idArray.indexOf(question) !== -1) {
+                            resultArr.push(questions["question_data"][question]);
+                        }
+                    }
+                    res.status(200).send(resultArr);
+                });
+            }
+
+        });
+
+    }
+
+}
+
 /** 
 *   Lists all replies to question identified by q_id 
 *   in parameter of GET request. 
@@ -461,6 +515,13 @@ app.post('/reply/', addReply);
 *   All tags are converted to lower case.
 */
 app.post('/tag/', addTag);
+
+/** If no query parameter ?tag=<value>, returns a list of tags.
+*   If query parameter present, returns a list of matching questions. 
+*/
+app.get('/tags*/', listTags);
+
+
 
 app.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');    
