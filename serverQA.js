@@ -15,7 +15,8 @@ var sanitizer = require('sanitizer');
 // You will also need to replace the server name with the details given by
 // couchdb. Will need to include password and user name if this is setup in couchdb
 // "http://user:password@addressToCouchdb"
-var nano = require('nano')('http://ddm4:WTs7FPTK@pc2-090-l.cs.st-andrews.ac.uk:20049');
+var nano = require('nano')('http://ddm4:4hrH9Pmb@pc3-037-l.cs.st-andrews.ac.uk:20049');
+
 
 var qa_db = nano.db.use('questions'); // Reference to the database storing the tasks
 var user_db = nano.db.use('usernames'); //Reference to the database storing usernames and passwords
