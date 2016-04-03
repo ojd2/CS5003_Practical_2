@@ -68,14 +68,15 @@ function listTags (req, res) {
                 qa_db.get('question_info', { revs_info : true }, function (err, questions) {
                     //for every qieston in question_data, if key equals a value in q_idArray 
                     //we want to include this question object in the respond object 
-                    var resultArr = [];
+                    var resultObj = {};
                     for (var question in questions["question_data"]) {
                         
                         if(q_idArray.indexOf(question) !== -1) {
-                            resultArr.push(questions["question_data"][question]);
+                            resultObj[question] = questions["question_data"][question];
+                            //resultArr.push();
                         }
                     }
-                    res.status(200).send(resultArr);
+                    res.status(200).send(resultObj);
                 });
             }
 
