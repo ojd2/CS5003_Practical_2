@@ -64,7 +64,8 @@ function addReplyHandlers() {
 		q_id = $(this).closest('li').find('#q_id').html().trim();
 
 		rep_val = $(this).closest("li").find(".rep_textbox").val().trim().toString();
-		console.log(q_id+':'+ rep_val);
+
+		console.log('repl_val: '+ rep_val);
 		// Conditionals to make sure users cannot submit empty replies.
 		if (rep_val === " " || rep_val === "") {     
 			$('.rep_textbox').css('border', '1px solid red');
@@ -98,8 +99,7 @@ function addTagHandlers() {
 
 			$('.add_tag').click(function(event) {
 				// Additionally, we have to collect the question id.
-				// We need this for our POST request method.
-				alert('something');
+				q_id = $(this).closest('li').find('#q_id').html().trim();
 				// Capture the value of the tag input area.
 				tag_value = $(this).closest("li").find(".tag_entry").val().trim().toString();
 				// Conditionals to make sure users cannot submit empty replies.
@@ -111,7 +111,7 @@ function addTagHandlers() {
 				else {
 					console.log('Entered Tag value: ' + tag_value);
 					// Call the sendTag method if user has entered content into input area.
-					//sendTag();
+					sendTag();
 					//sendTag(tag_value);
 					// Clear values.
 					$('.tag_entry').html('');
@@ -182,26 +182,30 @@ function displayAll(objects, search) {
 			  	subTime +
 			  	'</span></div>';
 			  	// Begin Question Tags HTML area.
-			  	if (objects[k].user !== undefined) {
+			  	if (objects[k].tags !== undefined) {
 					// Add tags to HTML below.
-					question.innerHTML += '<input class="btn btn-default btn-tag" type="button" value="' + objects[k].user + '">';
-					// Begin 'edit tags' HTML area.
-					question.innerHTML +=
-					'<div class="tags_container form-inline">' +
-					'<div class="show_tags col-xs-4 "></div>' +
-					'</div>' +
-					'<div class="clearfix"></div>' +
-					'<span class="edit_tag badge">Edit Topics ' + 
-					'<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
-					'</span>';
-				} else {
-					question.innerHTML +=
-					'<div class="clearfix"></div>' +
-					'<span class="edit_tag badge">Add Topic ' + 
-					'<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
-					'</span>' +
-					'<div class="show_tags"></div>';
-				}
+					for (var e = 0; e < objects[k].tags.length; e++) {
+						question.innerHTML += '<input class="btn btn-default btn-tag" type="button" value="' + objects[k].tags[e] + '">';
+			  		}
+			  	}
+
+				// Begin 'edit tags' HTML area.
+				// question.innerHTML +=
+				// '<div class="tags_container form-inline">' +
+				// '<div class="show_tags col-xs-4 "></div>' +
+				// '</div>' +
+				// '<div class="clearfix"></div>' +
+				// '<span class="edit_tag badge">Edit Topics ' + 
+				// '<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
+				// '</span>';
+
+				question.innerHTML +=
+				'<div class="clearfix"></div>' +
+				'<span class="edit_tag badge">Add Topic ' + 
+				'<span class="glyphicon glyphicon-edit" aria-hidden="false"></span>' +
+				'</span>' +
+				'<div class="show_tags"></div>';
+
 				// Begin Replies HTML area.
 			  	question.innerHTML += '<b class="rep_title">Replies:</b>';
 			  	if (objects[k].replies !== undefined) {
@@ -325,6 +329,25 @@ function getQuestion() {
     req.send(null);
     
 }
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Add a tag by making POST request to node server.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function sendTag(){
+    req = new XMLHttpRequest();
+    req.open("POST", "tag");
+    req.setRequestHeader("Content-Type", "text/plain");
+    req.send('{"q_id":"'+q_id+'","tag":"'+tag_value+'"}');
+    req.onreadystatechange = function() {
+ 	  	if (req.readyState == 4) {
+    		//refresh the question panel.
+    		getResponse();
+    	}
+    }
+}
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a reply by making POST request to node server.
@@ -342,6 +365,7 @@ function sendReply(){
     	}
     }
 }
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a new question by making POST request to node server
