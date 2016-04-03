@@ -52,7 +52,8 @@ function addReplyHandlers() {
 		q_id = $(this).closest('li').find('#q_id').html().trim();
 
 		rep_val = $(this).closest("li").find(".rep_textbox").val().trim().toString();
-		console.log(q_id+':'+ rep_val);
+
+		console.log('repl_val: '+ rep_val);
 		// Conditionals to make sure users cannot submit empty replies.
 		if (rep_val === " " || rep_val === "") {     
 			$('.rep_textbox').css('border', '1px solid red');
@@ -86,8 +87,7 @@ function addTagHandlers() {
 
 			$('.add_tag').click(function(event) {
 				// Additionally, we have to collect the question id.
-				// We need this for our POST request method.
-				alert('something');
+				q_id = $(this).closest('li').find('#q_id').html().trim();
 				// Capture the value of the tag input area.
 				tag_value = $(this).closest("li").find(".tag_entry").val().trim().toString();
 				// Conditionals to make sure users cannot submit empty replies.
@@ -99,7 +99,7 @@ function addTagHandlers() {
 				else {
 					console.log('Entered Tag value: ' + tag_value);
 					// Call the sendTag method if user has entered content into input area.
-					//sendTag();
+					sendTag();
 					//sendTag(tag_value);
 					// Clear values.
 					$('.tag_entry').html('');
@@ -302,6 +302,25 @@ function getQuestion() {
     req.send(null);
     
 }
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Add a tag by making POST request to node server.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function sendTag(){
+    req = new XMLHttpRequest();
+    req.open("POST", "tag");
+    req.setRequestHeader("Content-Type", "text/plain");
+    req.send('{"q_id":"'+q_id+'","tag":"'+tag_value+'"}');
+    req.onreadystatechange = function() {
+ 	  	if (req.readyState == 4) {
+    		//refresh the question panel.
+    		getResponse();
+    	}
+    }
+}
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a reply by making POST request to node server.
@@ -319,6 +338,7 @@ function sendReply(){
     	}
     }
 }
+
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a new question by making POST request to node server
