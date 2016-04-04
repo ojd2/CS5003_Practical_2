@@ -25,7 +25,7 @@ var nano = require('nano')('http://userName:password@host:port');
 ```
 Line 12 in startDB.js should also be edited as above.
 
-4. To start the web server, navigate the terminal to the local clone. Checkout branch joined. Run commands 'node startDB.js'. Then 'node serverQA.js'. The web application should not be availabe at <http://localhost:8080>.
+4. To start the web server, navigate the terminal to the local clone. Checkout branch joined. Run commands 'node startDB.js'. Then 'node serverQA.js'. The web application should now be availabe at <http://localhost:8080>.
 
 5. There are three hardcoded users. No user registration is currently avaiable. Thus, when you navigate to <http://localhost:8080>, you can use one of the three following username and password combinations:
 
