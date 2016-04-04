@@ -265,7 +265,7 @@ function orderKeys(objects) {
  // our sorted objects into an associative array.
  Object.keys(objects).sort(function(a, b) {
   	 	return a - b;
- }).forEach(function(v, i) {
+ 	}).forEach(function(v, i) {
        // Push our objects into the 
        // associative array: sorted.
        sorted = objects;
@@ -293,8 +293,8 @@ function orderKeys(objects) {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 function addHandlersForSideBar(tagArray) {
-	console.log('into addHandlersForSideBar and the tags to add are:' + tagArray);
 	var div = $('<div />');
+	tagArray.reverse();
 	// For loop that iterates over the returned tag array. 
 	// This particular loop only shows 3 latest tags.
 	for (var i = 0; i < 3; i++) {
