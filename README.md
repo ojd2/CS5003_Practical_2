@@ -13,8 +13,4 @@ The application was built in collaboration with Donal Mee.
 
 # How to install
 
-<<<<<<< HEAD
 All NPM modules must be stored or attained within root folder before hand. 
-=======
-All NPM modules must be stored or attained within root folder. 
->>>>>>> 0bacfbc3c13bb34cda92cca78d10acd776e0651a

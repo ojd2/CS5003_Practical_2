@@ -16,6 +16,18 @@ rep_q, rep_text, rep_submit, rep_reply, rep_time, rep_val, rep_area, test,
  q_title, q_meta, q_id, date, userName, password, tag_value, search_value;
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
+// Attach event handler to capture tag text and call a request 
+// to pull in questions with the same tag.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function addTagCallHandler() {
+	$(".btn-tag").click(function(event) {
+		tag_text = $(this).val();
+		getQuestionsByTag(tag_text);
+	});
+}
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // Attach event handler to capture search term from search input area.
 // Triggers an algorithm to search through questions and find matches.
 // ----------------------------------------------------------------------
@@ -55,7 +67,7 @@ function addSearchHandler() {
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 //	Attach event handler to all reply submit buttons to capture reply 
-//	to a question. Call function after replies have been added to HTML DOM.
+//	to a question. Call function after replies have been added to DOM.
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 function addReplyHandlers() {
@@ -253,7 +265,7 @@ function orderKeys(objects) {
  // our sorted objects into an associative array.
  Object.keys(objects).sort(function(a, b) {
   	 	return a - b;
- }).forEach(function(v, i) {
+ 	}).forEach(function(v, i) {
        // Push our objects into the 
        // associative array: sorted.
        sorted = objects;
@@ -270,6 +282,43 @@ function orderKeys(objects) {
    	addReplyHandlers();
    	addTagHandlers();
    	addSearchHandler();
+   	addTagCallHandler();
+   	getSideBar();
+
+}
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Event Handler for appending HTML elements to sidebar for question
+// tags. Method identifies the HTML and inserts tags as buttons.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function addHandlersForSideBar(tagArray) {
+	var div = $('<div />');
+	tagArray.reverse();
+	// For loop that iterates over the returned tag array. 
+	// This particular loop only shows 3 latest tags.
+	for (var i = 0; i < 3; i++) {
+		div.append('<li><input type="button" class="sidebar-tag btn" value="' + tagArray[i]  + '"/></li>');
+	}
+	// We add our 'div' instance to '.latestTags' <ul> in the HTML.
+	$('.latestTags').html(div);
+}
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Retrieve ALL tags for questions via AJAX request.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function getSideBar() {
+	var req = new XMLHttpRequest();
+    req.open("GET", "tags");
+    req.setRequestHeader("Content-Type", "text/plain");
+    req.onreadystatechange = function() {
+        // Call sorting method for our parsed response.
+    	if (req.readyState == 4) {
+    		addHandlersForSideBar(JSON.parse(req.responseText));
+   		}
+    }
+    req.send(null);
 
 }
 // ----------------------------------------------------------------------
@@ -305,7 +354,24 @@ function getQuestion() {
     }
     req.send(null);
 }
-
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+// Retrieve the question by matching with a particular tag using 
+// AJAX request.
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
+function getQuestionsByTag(tag) {
+    req = new XMLHttpRequest();
+    var url = "tags?tag=" + tag;
+    req.open("GET", url);
+    req.setRequestHeader("Content-Type", "text/plain");    
+    req.onreadystatechange = function() {
+  		if (req.readyState == 4) {
+  			displayQuestion(JSON.parse(req.responseText));
+  		}
+    }
+    req.send(null);
+}
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 // Add a tag by making POST request to node server.
@@ -361,8 +427,8 @@ function sendQuestion(question){
 }
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
-//Open a post request to path /login, with userName and password formatted
-//into JSON object. If successful login, reload client browser to path '/'
+// Open a post request to path /login, with userName and password formatted
+// into JSON object. If successful login, reload client browser to path '/'
 // ----------------------------------------------------------------------
 // ----------------------------------------------------------------------
 function loginRoute(userName, password) {
@@ -405,16 +471,16 @@ function init() {
 	// Event handler for submit login button.
 	$("#loginButton").click(function(event) {
 		// Get data from userName and password input elements when submit button
-		// is clicked by the user on login.html
+		// is clicked by the user on login.html.
 		userName = $("#userName").val().trim();
 		password = $("#userPassword").val().trim();
 		
-		//Send a post request to '/login/' with the body of request in JSON
-		//formatted like this example: '{"userName":"edwin", "password":"notActually"}'
+		// Send a post request to '/login/' with the body of request in JSON
+		// formatted like this example: '{"userName":"edwin", "password":"notActually"}'.
 		loginRoute(userName, password);
-		//if loginRoute is successful, a cookie will be stored on the client browser and
-		//loginRoute will redirect the client browser to path '/' where page.html will 
-		//be served.
+		// If loginRoute is successful, a cookie will be stored on the client browser and
+		// loginRoute will redirect the client browser to path '/' where page.html will 
+		// be served.
 	});
 		
 	// Event handler for new question submission.
@@ -426,7 +492,7 @@ function init() {
 				$('.q_container').addClass('has-error').css('border', '1px solid red');
 			}
 			else {
-				// Send a post request to the server to add question to db
+				// Send a post request to the server to add question to db.
 				sendQuestion(entry);
 				// Clear textbox, set values back (as-was) before any errors.
 				$('#userQuestion').val('');	
