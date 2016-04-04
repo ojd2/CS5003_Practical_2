@@ -22,6 +22,8 @@ var qa_db = nano.db.use('questions'); // Reference to the database storing the t
 var user_db = nano.db.use('usernames'); //Reference to the database storing usernames and passwords
 
 
+// ----------- FUNCTIONS FOR THE ROUTING SECTION TO CALL --------------------------------------------
+//---------------------------------------------------------------------------------------------------
 /**
 *   Translate cookie into username. Very silly function. Presumes all cookie come in form:
 *   '<usernameValue>Cookie' that is present in session cookie in client browser.
@@ -117,7 +119,9 @@ function listReplies(req, res) {
     }
 }
 
-// List all the questions information as JSON, test for valid session. 
+/*
+*    List all the questions information as JSON, test for valid session. 
+*/
 function listQuestions(req, res) {
     if (validateSession(req.cookies.session) === true) {
         qa_db.get('question_info', { revs_info : true }, function (err, questions) {
@@ -128,32 +132,6 @@ function listQuestions(req, res) {
         res.send('No valid session cookie presented. User not logged in.');
     }
 }
-
-/*
-* Get the task with the given id req.id.
-*/
-function getTask(req, res) {
-    qa_db.get('question_info', { revs_info : true }, function (err, tasks) {
-        res.json(tasks["task_data"][req.params.id]);
-    });
-}
-
-/*
-* Delete the task with the given id req.id.
-*/
-function deleteTask(req, res) {
-    qa_db.get('question_info', { revs_info : true }, function (err, tasks) {
-        delete tasks["task_data"][req.params.id];
-
-        // Note that 'tasks' already contains the _rev field we need to 
-        // update the data
-
-        qa_db.insert(tasks, 'question_info', function (err, t) {
-            res.json(tasks["task_data"]);
-        });
-    });
-}
-
 
 /*
 *   Add updated tags information to Couchdb.
@@ -449,7 +427,11 @@ function frontPage(req, res){
 
 }
 
-// --- Standard app setup for express -------------------
+// ----------- END OF FUNCTIONS SECTION -------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
+
+
+// --- Standard app setup for express --------------------------------------------
 var app = express()
 app.use(json());
 app.use(express.query());
@@ -458,10 +440,11 @@ app.use(cookieParser()); //For cookie handling.
 
 app.use(express.static('node_modules'));
 app.use(express.static('dist'));
-//-------------------------------------------------------
+//--------------------------------------------------------------------------------
 
 
-// -- Routing functions using Express as middleware follow ---------
+// -- Routing using Express as middleware follow ------------------------------------------
+//---------------------------------------------------------------------------------------------------
 
 
 /** If valid session cookie presented in get header, returns
@@ -527,23 +510,5 @@ app.get('/tags*/', listTags);
 app.listen(8080);
 console.log('Server running at http://127.0.0.1:8080/');    
 
-// ------- Testing section ------------------------
-
-// Also see backendTest.js 
-
-// --- func validateSession ------------
-// //should return true
-// console.log(validateSession('tempUser'));
-
-// //should return false
-// console.log(validateSession(''));
-
-// //should return false
-// console.log(validateSession(undefined));
-
-// //should return false
-// console.log(validateSession('true'));
-
-// //should return false
-// console.log(validateSession('terls'));
-// -- end of validateSession ------------
+// -- End of Routing Middleware ---------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
