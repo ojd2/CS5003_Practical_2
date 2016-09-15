@@ -35,10 +35,3 @@ Line 12 in startDB.js should also be edited as above.
 | ollie         | camelCase     |
 | donal         | justAnother   |
 
-
-
-
-<<<<<<< HEAD
-=======
-
->>>>>>> remotes/origin/joined
