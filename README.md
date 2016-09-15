@@ -2,11 +2,6 @@
 
 The following project was built for a online web application assignment for the University of St.Andrews School of Comupter Science. The project was submitted on 04/04/2016.
 
-<<<<<<< HEAD
-### Please switch to the branch `joined`.
-
-=======
->>>>>>> remotes/origin/joined
 # Glasgow Echo
 
 Glasgow Echo is a small node js application which was built with express.js and CouchDB. The application is a simple
@@ -30,9 +25,9 @@ var nano = require('nano')('http://userName:password@host:port');
 ```
 Line 12 in startDB.js should also be edited as above.
 
-4. To start the web server, navigate the terminal to the local clone. Checkout branch joined. Run commands 'node startDB.js'. Then 'node serverQA.js'. The web application should now be availabe at <http://localhost:8080>.
+1. To start the web server, navigate the terminal to the local clone. Checkout branch joined. Run commands 'node startDB.js'. Then 'node serverQA.js'. The web application should now be availabe at <http://localhost:8080>.
 
-5. There are three hardcoded users. No user registration is currently avaiable. Thus, when you navigate to <http://localhost:8080>, you can use one of the three following username and password combinations:
+2. There are three hardcoded users. No user registration is currently avaiable. Thus, when you navigate to <http://localhost:8080>, you can use one of the three following username and password combinations:
 
 | Username      | Password      | 
 | ------------- |:-------------:|
