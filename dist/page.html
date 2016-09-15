@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Echo - Q&A</title>
+    <title>Glasgow Echo - Q&A</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -41,77 +41,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">Echo</a>
+                <a class="navbar-brand" href="/">Glasgow Echo</a>
             </div>
             <!-- /.navbar-header -->
 
-            <ul class="nav navbar-top-links navbar-right">
+            <ul class="nav navbar-top-links navbar-right">            
                 <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-messages">
-                        <li>
-                            <a href="#">
-                                <div>
-                                    <strong>John Smith</strong>
-                                    <span class="pull-right text-muted">
-                                        <em>Yesterday</em>
-                                    </span>
-                                </div>
-                                <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="#">
-                                <div>
-                                    <strong>User ID</strong>
-                                    <span class="pull-right text-muted">
-                                        <em>Yesterday</em>
-                                    </span>
-                                </div>
-                                <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="#">
-                                <div>
-                                    <strong>John Smith</strong>
-                                    <span class="pull-right text-muted">
-                                        <em>Yesterday</em>
-                                    </span>
-                                </div>
-                                <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a class="text-center" href="#">
-                                <strong>Read All Messages</strong>
-                                <i class="fa fa-angle-right"></i>
-                            </a>
-                        </li>
-                    </ul>
-                    <!-- /.dropdown-messages -->
-                </li>
-                <!-- /.dropdown -->
-                
-                
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
-                        </li>
-                        
-                        </li>
-                        <li class="divider"></li>
-                        <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
-                        </li>
-                    </ul>
+                        <li><a id="logout" href=""><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
                     <!-- /.dropdown-user -->
                 </li>
                 <!-- /.dropdown -->
@@ -123,9 +59,9 @@
                     <ul class="nav" id="side-menu">
                         <li class="sidebar-search">
                             <div class="input-group custom-search-form">
-                                <input type="text" class="form-control" placeholder="Search...">
+                                <input id="search" type="text" class="form-control" placeholder="Search...">
                                 <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
+                                <button class="search_submit btn btn-default" type="button">
                                     <i class="fa fa-search"></i>
                                 </button>
                             </span>
@@ -133,30 +69,19 @@
                             <!-- /input-group -->
                         </li>
                         <li>
-                            <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> About</a>
+                            <a href="about.html"><i class="fa fa-info fa-fw"></i> About</a>
 
                         </li>
                         <li>
-                            <a href="index.html"><i class="fa fa-dashboard fa-fw"></i> Contact</a>
+                            <a href="contact.html"><i class="fa fa-phone fa-fw"></i> Contact</a>
 
                         </li>
                         <li>
                             <a href="#">
                             <i class="fa fa-bar-chart-o fa-fw"></i> 
-                            Link 1<span class="fa arrow"></span></a>
-                            <ul class="nav nav-second-level">
-                                <li>
-                                    <a href="flot.html">
-                                    <i class="fa fa-bar-chart-o fa-fw"></i>
-                                    Link 2
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="morris.html">
-                                    <i class="fa fa-bar-chart-o fa-fw"></i>
-                                    Link 3
-                                    </a>
-                                </li>
+                            Latest tags<span class="fa arrow"></span></a>
+                            <ul class="latestTags nav nav-second-level">
+                                <!-- Sidebar Tags go here -->
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
@@ -179,11 +104,11 @@
                         <form class="form-horizontal">
                               <div class="form-group form-group-lg">
                                 <label class="sr-only" for="QuestionID">Submit Question</label>
-                                <div class="input-group">
+                                <div class="q_container input-group">
                                   <div class="input-group-addon">Q:</div>
                                   
                                   <!-- Question Input Area -->
-                                  <input type="text" id="q_id" class="input-lg form-control"  placeholder="Write your question here">
+                                  <input type="text" id="userQuestion" class="input-lg form-control"  placeholder="Write your question here">
                                   <!-- End Question Input Area -->
                                 </div>
                               </div>
@@ -200,7 +125,8 @@
             <div class="row">
             
                 <div class="col-lg-12">
-                    
+                    <div class="search_container"></div>
+
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-clock-o fa-fw"></i> 
@@ -224,8 +150,7 @@
 
     </div>
     <!-- /#wrapper -->
-    
-</body>
+
     <!-- jQuery -->
     <script src="jquery/dist/jquery.min.js"></script>
 
@@ -234,5 +159,6 @@
 
     <!-- Custom JavaScript -->
     <script src="js/init.js"></script>
+</body>
 
 </html>

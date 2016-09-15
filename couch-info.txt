@@ -1,0 +1,16 @@
+sh-4.3$ couchdb-setup
+
+You have configured an instance of CouchDB on _this_ host.
+The following settings apply to this host _only_.
+
+CouchDB admin username: ddm4
+CouchDB admin password: 4hrH9Pmb
+CouchDB admin page URL: http://pc3-037-l.cs.st-andrews.ac.uk:20049/_utils/index.html
+
+CouchDB files location (on this host): /cs/scratch/ddm4/couchdb
+CouchDB configuration file (on this host): /cs/scratch/ddm4/couchdb/local.ini
+
+Use 'couchdb-start' (no quotes) to start CouchDB
+Use 'couchdb-status' (no quotes) to check if CouchDB is running
+Use 'couchdb-stop' (no quotes) to stop CouchDB
+

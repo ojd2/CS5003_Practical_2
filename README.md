@@ -2,8 +2,11 @@
 
 The following project was built for a online web application assignment for the University of St.Andrews School of Comupter Science. The project was submitted on 04/04/2016.
 
+<<<<<<< HEAD
 ### Please switch to the branch `joined`.
 
+=======
+>>>>>>> remotes/origin/joined
 # Glasgow Echo
 
 Glasgow Echo is a small node js application which was built with express.js and CouchDB. The application is a simple
@@ -40,3 +43,7 @@ Line 12 in startDB.js should also be edited as above.
 
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> remotes/origin/joined
